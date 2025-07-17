@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Película - Director</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    #btnAgregar {
+      background-color: #1e88e5;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #btnAgregar:hover {
+      background-color: #1565c0;
+    }
+
+    #lista {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      padding: 8px;
+      transition: transform 0.2s ease;
+      position: relative;
+      text-align: center;
+    }
+
+    .card:hover {
+      background-color: #2a2a2a;
+      transform: scale(1.03);
+    }
+
+    .card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .card-info {
+      padding-top: 6px;
+    }
+
+    .card-info p {
+      margin: 2px 0;
+      font-size: 13px;
+      color: #ccc;
+    }
+
+    .card-info p.nombre {
+      font-weight: bold;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .btn-eliminar {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: transparent;
+      color: #e53935;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .card:hover .btn-eliminar {
+      display: block;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+    }
+
+    .modal-content {
+      background: #1e1e1e;
+      padding: 20px;
+      margin: 10% auto;
+      width: 320px;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .modal-content select,
+    .modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      background: #333;
+      color: white;
+    }
+
+    .modal-content button {
+      width: 100%;
+      padding: 10px;
+      background: #1e88e5;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #f44336;
+    }
+
+    #mensajeError {
+      background: #b71c1c;
+      color: white;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Relación Película - Director</h1>
+  <div id="mensajeError"></div>
+  <button id="btnAgregar">Agregar relación</button>
+  <div id="lista"></div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h3 id="modal-title">Agregar relación</h3>
+      <select id="selectPelicula"></select>
+      <select id="selectDirector"></select>
+      <button onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:3000/api";
+    const lista = document.getElementById("lista");
+    const modal = document.getElementById("modal");
+    const selectDirector = document.getElementById("selectDirector");
+    const selectPelicula = document.getElementById("selectPelicula");
+    const mensajeError = document.getElementById("mensajeError");
+
+    function abrirModal() {
+      modal.style.display = "block";
+      cargarListas();
+    }
+
+    function cerrarModal() {
+      modal.style.display = "none";
+    }
+
+    async function cargarListas() {
+      try {
+        const [resDirectores, resPeliculas] = await Promise.all([
+          fetch(`${API_BASE}/directores`),
+          fetch(`${API_BASE}/peliculas`)
+        ]);
+
+        const directores = await resDirectores.json();
+        const peliculas = await resPeliculas.json();
+
+        selectDirector.innerHTML = directores.map(d =>
+          `<option value="${d.id}">${d.nombre}</option>`).join("");
+        selectPelicula.innerHTML = peliculas.map(p =>
+          `<option value="${p.id}">${p.titulo_espanol}</option>`).join("");
+      } catch (error) {
+        console.error("Error al cargar listas:", error);
+      }
+    }
+
+    async function cargarDatos() {
+      try {
+        const response = await fetch(`${API_BASE}/pelicula_director`);
+        const data = await response.json();
+        lista.innerHTML = "";
+
+        data.sort((a, b) => {
+          const tituloA = a.titulo_pelicula || "";
+          const tituloB = b.titulo_pelicula || "";
+          return tituloA.localeCompare(tituloB);
+        });
+
+        data.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "card";
+
+          div.innerHTML = `
+            <button class="btn-eliminar" onclick="eliminar(${item.id_pelicula}, ${item.id_director})">&#128465;</button>
+            <img src="${item.imagen_director || 'https://via.placeholder.com/150'}" alt="Foto director">
+            <div class="card-info">
+              <p class="nombre">${item.nombre_director || "Sin nombre"}</p>
+              <p>${item.titulo_pelicula || "Sin título"}</p>
+            </div>
+          `;
+          lista.appendChild(div);
+        });
+      } catch (error) {
+        console.error("Error al cargar relaciones:", error);
+      }
+    }
+
+    async function guardar() {
+      const id_pelicula = selectPelicula.value;
+      const id_director = selectDirector.value;
+
+      if (!id_pelicula || !id_director) {
+        alert("Completa todos los campos.");
+        return;
+      }
+
+      const data = { id_pelicula, id_director };
+
+      try {
+        const res = await fetch(`${API_BASE}/pelicula_director`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          mostrarMensaje(err.detalle || "Error al agregar relación");
+          return;
+        }
+
+        cerrarModal();
+        cargarDatos();
+      } catch (err) {
+        console.error(err);
+        mostrarMensaje("Error al guardar relación");
+      }
+    }
+
+    function eliminar(id_pelicula, id_director) {
+      if (confirm("¿Eliminar esta relación?")) {
+        fetch(`${API_BASE}/pelicula_director/${id_pelicula}/${id_director}`, {
+          method: "DELETE"
+        }).then(() => cargarDatos());
+      }
+    }
+
+    function mostrarMensaje(mensaje) {
+      mensajeError.textContent = mensaje;
+      mensajeError.style.display = "block";
+      setTimeout(() => {
+        mensajeError.style.display = "none";
+      }, 4000);
+    }
+
+    document.getElementById("btnAgregar").addEventListener("click", abrirModal);
+    window.onclick = e => { if (e.target === modal) cerrarModal(); };
+
+    cargarDatos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Películas - CRUD Moderno</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #f1f1f1;
+    }
+    header {
+      background-color: #1e1e1e;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #00e676;
+    }
+    .container {
+      padding: 30px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+    .card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      background-color: #000;
+    }
+    .card-content {
+      padding: 10px;
+      text-align: center;
+    }
+    .card h3 {
+      margin: 10px 0 0;
+      font-size: 18px;
+      color: #fff;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      overflow-y: auto;
+    }
+    .modal-content {
+      background-color: #1e1e1e;
+      color: #fff;
+      margin: 3% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 900px;
+    }
+    .close {
+      float: right;
+      font-size: 24px;
+      cursor: pointer;
+      color: #f44336;
+    }
+    .modal h2 {
+      color: #00e676;
+      margin-bottom: 10px;
+    }
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .info-section p {
+      margin: 6px 0;
+    }
+    .section-title {
+      margin-top: 20px;
+      color: #00e676;
+      font-weight: bold;
+    }
+    .relations {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .relation-card {
+      background-color: #2a2a2a;
+      border-radius: 6px;
+      text-align: center;
+      padding: 8px;
+    }
+    .relation-card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .relation-card span {
+      display: block;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Películas</h1>
+  </header>
+
+  <div class="container">
+    <div class="grid" id="contenedor"></div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h2 id="modal-titulo">Título</h2>
+
+      <div class="video-container">
+        <iframe id="video-trailer" src="" frameborder="0" allowfullscreen></iframe>
+      </div>
+
+      <div class="info-section">
+        <p><strong>Título original:</strong> <span id="detalle-original"></span></p>
+        <p><strong>Año:</strong> <span id="detalle-ano"></span></p>
+        <p><strong>Duración:</strong> <span id="detalle-duracion"></span></p>
+        <p><strong>País:</strong> <span id="detalle-pais"></span></p>
+        <p><strong>Calificación:</strong> <span id="detalle-calificacion"></span></p>
+        <p><strong>Fecha de estreno:</strong> <span id="detalle-estreno"></span></p>
+        <p><strong>Sinopsis:</strong></p>
+        <p id="detalle-sinopsis"></p>
+      </div>
+
+      <div id="relaciones"></div>
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = "http://localhost:3000/api/peliculas";
+    const contenedor = document.getElementById("contenedor");
+    const modal = document.getElementById("modal");
+    const modalTitulo = document.getElementById("modal-titulo");
+    const videoTrailer = document.getElementById("video-trailer");
+    const detalleOriginal = document.getElementById("detalle-original");
+    const detalleAno = document.getElementById("detalle-ano");
+    const detalleDuracion = document.getElementById("detalle-duracion");
+    const detallePais = document.getElementById("detalle-pais");
+    const detalleCalificacion = document.getElementById("detalle-calificacion");
+    const detalleEstreno = document.getElementById("detalle-estreno");
+    const detalleSinopsis = document.getElementById("detalle-sinopsis");
+    const relaciones = document.getElementById("relaciones");
+
+    const cargarItems = async () => {
+      try {
+        const res = await fetch(apiUrl);
+        const items = await res.json();
+        contenedor.innerHTML = "";
+
+        items.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.onclick = () => mostrarDetalles(item);
+
+          const img = document.createElement("img");
+          img.src = item.imagen_portada || "https://via.placeholder.com/220x280?text=Sin+Poster";
+          img.alt = item.titulo_espanol;
+
+          const content = document.createElement("div");
+          content.className = "card-content";
+
+          const titulo = document.createElement("h3");
+          titulo.textContent = item.titulo_espanol;
+
+          content.appendChild(titulo);
+          card.appendChild(img);
+          card.appendChild(content);
+          contenedor.appendChild(card);
+        });
+      } catch (error) {
+        console.error("Error al cargar películas:", error);
+        contenedor.innerHTML = "<p>Error al cargar películas</p>";
+      }
+    };
+
+    const mostrarDetalles = (item) => {
+      modalTitulo.textContent = item.titulo_espanol;
+
+      if (item.trailer_url?.includes("watch?v=")) {
+        const videoId = item.trailer_url.split("watch?v=")[1].split("&")[0];
+        videoTrailer.src = `https://www.youtube.com/embed/${videoId}`;
+      } else {
+        videoTrailer.src = "";
+      }
+
+      detalleOriginal.textContent = item.titulo_original || "";
+      detalleAno.textContent = item.ano_estreno || "";
+      detalleDuracion.textContent = item.duracion + " min" || "";
+      detallePais.textContent = item.pais || "";
+      detalleCalificacion.textContent = item.calificacion || "";
+      detalleEstreno.textContent = item.fecha_estreno || "";
+      detalleSinopsis.textContent = item.sinopsis || "";
+      relaciones.innerHTML = "";
+
+      const mostrarRelacion = (titulo, lista, campoImagen = "imagen_url", campoTexto = "nombre") => {
+        if (lista && lista.length > 0) {
+          const section = document.createElement("div");
+          section.innerHTML = `<div class='section-title'>${titulo}</div>`;
+
+          const grid = document.createElement("div");
+          grid.className = "relations";
+
+          lista.forEach(el => {
+            const card = document.createElement("div");
+            card.className = "relation-card";
+
+            if (titulo === "Géneros" || titulo === "Idiomas") {
+              const label = document.createElement("span");
+              const icon = titulo === "Géneros" ? "🎞️" : "🌐";
+              label.textContent = `${icon} ${el[campoTexto]}`;
+              card.appendChild(label);
+            } else {
+              const img = document.createElement("img");
+              img.src = el[campoImagen] || "https://via.placeholder.com/120x100?text=Sin+Imagen";
+              const label = document.createElement("span");
+              label.textContent = el.pelicula_actor?.personaje
+                ? `${el[campoTexto]} (${el.pelicula_actor.personaje})`
+                : el[campoTexto];
+              card.appendChild(img);
+              card.appendChild(label);
+            }
+
+            grid.appendChild(card);
+          });
+
+          section.appendChild(grid);
+          relaciones.appendChild(section);
+        }
+      };
+
+      mostrarRelacion("Actores", item.Actors || []);
+      mostrarRelacion("Directores", item.directors || []);
+      mostrarRelacion("Compañías", item.compania || [], "logo_url");
+      mostrarRelacion("Géneros", item.generos || [], null, "nombre");
+      mostrarRelacion("Idiomas", item.idiomas || [], null, "nombre");
+
+      modal.style.display = "block";
+    };
+
+    const cerrarModal = () => {
+      videoTrailer.src = "";
+      modal.style.display = "none";
+    };
+
+    window.onclick = (e) => {
+      if (e.target === modal) cerrarModal();
+    };
+
+    cargarItems();
+  </script>
+</body>
+</html>
