@@ -1,98 +1,361 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crear Película</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* Variables de diseño - Tema oscuro */
+    :root {
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --error: #ef4444;
+      --success: #10b981;
+      --text: #e5e7eb;
+      --text-light: #9ca3af;
+      --bg: #111827;
+      --card-bg: #1f2937;
+      --border: #374151;
+      --radius: 0.5rem;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      --transition: all 0.3s ease;
+      --preview-bg: #111827;
+    }
+
+    /* Estilos base */
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f2f5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       display: flex;
       justify-content: center;
-      padding: 40px;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+      margin: 0;
+      line-height: 1.5;
     }
+
+    /* Contenedor del formulario */
     form {
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      background-color: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2.5rem;
       width: 100%;
       max-width: 500px;
+      transition: var(--transition);
+      border: 1px solid var(--border);
     }
+
+    /* Título */
     h1 {
       text-align: center;
-      color: #333;
+      color: var(--text);
+      margin-bottom: 2rem;
+      font-size: 1.75rem;
+      font-weight: 600;
+      position: relative;
     }
+
+    h1::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: var(--primary);
+      margin: 0.5rem auto 0;
+      border-radius: 2px;
+    }
+
+    /* Etiquetas */
     label {
       display: block;
-      margin-top: 15px;
-      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.875rem;
     }
+
+    label:not(:first-child) {
+      margin-top: 1.25rem;
+    }
+
+    /* Campos de entrada */
     input, textarea, button {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.9375rem;
+      transition: var(--transition);
       box-sizing: border-box;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+      background-color: rgba(17, 24, 39, 0.5);
+      color: var(--text);
     }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+      background-color: rgba(17, 24, 39, 0.7);
+    }
+
+    input:invalid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--error);
+    }
+
+    input:invalid:not(:focus):not(:placeholder-shown) + .error-message {
+      display: block;
+    }
+
+    /* Textarea */
     textarea {
       resize: vertical;
+      min-height: 100px;
     }
+
+    /* Grupo de inputs en línea */
     .inline-inputs {
       display: flex;
-      gap: 10px;
+      gap: 1rem;
     }
+
     .inline-inputs input {
       flex: 1;
     }
-    input:invalid {
-      border-color: red;
+
+    /* Botón */
+    button {
+      background-color: var(--primary);
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 2rem;
+      border: none;
+      padding: 0.875rem;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    button i {
+      font-size: 0.9em;
+    }
+
+    /* Mensajes de error */
+    .error-message {
+      color: var(--error);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    /* Placeholder */
+    ::placeholder {
+      color: var(--text-light);
+      opacity: 0.6;
+    }
+
+    /* Vista previa de imagen */
+    .image-preview-container {
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .image-preview-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .image-preview {
+      width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background-color: var(--preview-bg);
+      padding: 0.5rem;
+    }
+
+    /* Efecto hover para el formulario */
+    form:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Toggle de tema */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10;
+    }
+
+    .theme-toggle-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem;
+      }
+      
+      form {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Botón para cambiar tema (opcional) -->
+  <div class="theme-toggle">
+    <button class="theme-toggle-btn" id="themeToggle">
+      <i class="fas fa-moon"></i>
+    </button>
+  </div>
+
   <form id="formPelicula" novalidate>
-    <h1>Crear Película</h1>
+    <h1><i class="fas fa-film"></i> Crear Película</h1>
 
     <label for="titulo_espanol">Título español:</label>
-    <input type="text" id="titulo_espanol" required />
+    <input type="text" id="titulo_espanol" required placeholder="Ej: El Padrino" />
+    <div class="error-message">Este campo es obligatorio</div>
 
     <label for="titulo_original">Título original:</label>
-    <input type="text" id="titulo_original" required />
+    <input type="text" id="titulo_original" required placeholder="Ej: The Godfather" />
+    <div class="error-message">Este campo es obligatorio</div>
 
     <label for="ano_estreno">Año de estreno (1990-2050):</label>
-    <input type="number" id="ano_estreno" min="1990" max="2050" required />
+    <input type="number" id="ano_estreno" min="1990" max="2050" required placeholder="1990-2050" />
+    <div class="error-message">El año debe estar entre 1990 y 2050</div>
 
     <label>Duración:</label>
     <div class="inline-inputs">
-      <input type="number" id="duracion_horas" min="0" placeholder="Horas" required />
-      <input type="number" id="duracion_minutos" min="0" max="59" placeholder="Minutos" required />
+      <div style="flex: 1;">
+        <input type="number" id="duracion_horas" min="0" placeholder="Horas" required />
+        <div class="error-message">Valor inválido</div>
+      </div>
+      <div style="flex: 1;">
+        <input type="number" id="duracion_minutos" min="0" max="59" placeholder="Minutos" required />
+        <div class="error-message">Debe ser 0-59</div>
+      </div>
     </div>
 
     <label for="calificacion">Calificación (1.0 - 10.0):</label>
-    <input type="number" id="calificacion" step="0.1" min="1.0" max="10.0" required />
+    <input type="number" id="calificacion" step="0.1" min="1.0" max="10.0" required placeholder="Ej: 8.5" />
+    <div class="error-message">Debe ser entre 1.0 y 10.0</div>
 
     <label for="fecha_estreno">Fecha estreno:</label>
     <input type="date" id="fecha_estreno" required />
+    <div class="error-message">Selecciona una fecha</div>
 
     <label for="sinopsis">Sinopsis:</label>
-    <textarea id="sinopsis" required></textarea>
+    <textarea id="sinopsis" required placeholder="Describe la trama de la película..."></textarea>
+    <div class="error-message">Este campo es obligatorio</div>
 
     <label for="trailer_url">Trailer URL:</label>
-    <input type="url" id="trailer_url" required />
+    <input type="url" id="trailer_url" required placeholder="https://youtube.com/watch?v=..." />
+    <div class="error-message">Ingresa una URL válida</div>
 
     <label for="pais">País:</label>
-    <input type="text" id="pais" required />
+    <input type="text" id="pais" required placeholder="Ej: Estados Unidos" />
+    <div class="error-message">Este campo es obligatorio</div>
 
     <label for="imagen_portada">Imagen portada URL:</label>
-    <input type="url" id="imagen_portada" required />
+    <input type="url" id="imagen_portada" required placeholder="https://example.com/poster.jpg" />
+    <div class="error-message">Ingresa una URL válida</div>
 
-    <button type="submit">Guardar Película</button>
+    <!-- Vista previa de la imagen -->
+    <div class="image-preview-container" id="imagePreviewContainer">
+      <span class="image-preview-label">Vista previa:</span>
+      <img src="" alt="Vista previa de la portada" class="image-preview" id="imagePreview">
+    </div>
+
+    <button type="submit"><i class="fas fa-save"></i> Guardar Película</button>
   </form>
 
   <script>
+    // Vista previa de la imagen
+    const imagenPortadaInput = document.getElementById('imagen_portada');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+
+    imagenPortadaInput.addEventListener('input', function() {
+      const url = this.value.trim();
+      if (url) {
+        imagePreview.src = url;
+        imagePreviewContainer.style.display = 'block';
+        
+        // Verificar si la imagen carga correctamente
+        imagePreview.onload = function() {
+          imagePreviewContainer.style.display = 'block';
+        };
+        
+        imagePreview.onerror = function() {
+          imagePreviewContainer.style.display = 'none';
+        };
+      } else {
+        imagePreviewContainer.style.display = 'none';
+      }
+    });
+
+    // Toggle de tema (opcional)
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    
+    themeToggle.addEventListener('click', function() {
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+      
+      // Cambiar variables CSS según el tema
+      if (isDark) {
+        // Tema claro
+        document.documentElement.style.setProperty('--text', '#333333');
+        document.documentElement.style.setProperty('--text-light', '#6b7280');
+        document.documentElement.style.setProperty('--bg', '#f9fafb');
+        document.documentElement.style.setProperty('--card-bg', '#ffffff');
+        document.documentElement.style.setProperty('--border', '#e5e7eb');
+        document.documentElement.style.setProperty('--preview-bg', '#f3f4f6');
+      } else {
+        // Tema oscuro
+        document.documentElement.style.setProperty('--text', '#e5e7eb');
+        document.documentElement.style.setProperty('--text-light', '#9ca3af');
+        document.documentElement.style.setProperty('--bg', '#111827');
+        document.documentElement.style.setProperty('--card-bg', '#1f2937');
+        document.documentElement.style.setProperty('--border', '#374151');
+        document.documentElement.style.setProperty('--preview-bg', '#111827');
+      }
+    });
+
+    // Mantener la lógica original del formulario
     const form = document.getElementById("formPelicula");
 
     form.addEventListener("submit", async function (e) {
