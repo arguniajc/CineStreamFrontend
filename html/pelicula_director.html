@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Película - Director</title>
+  <link rel="stylesheet" href="../css/pelicula_director.css">
+</head>
+<body>
+  <h1>Relación Película - Director</h1>
+  <div id="mensajeError"></div>
+  <button id="btnAgregar">Agregar relación</button>
+  <div id="lista"></div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h3 id="modal-title">Agregar relación</h3>
+      <select id="selectPelicula"></select>
+      <select id="selectDirector"></select>
+      <button onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+
+  <script src="../js/pelicula_director.js"></script>
+</body>
+</html>

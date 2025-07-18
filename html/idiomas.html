@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Idiomas - CRUD Moderno</title>
+  <link rel="stylesheet" href="../css/idiomas.css">
+</head>
+<body>
+  <header>
+    <h1>Gestión de Idiomas</h1>
+  </header>
+
+  <div class="container">
+    <div class="actions">
+      <button onclick="abrirModal()">Agregar Idioma</button>
+    </div>
+    <div class="grid" id="contenedor"></div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h2 id="modal-titulo">Nuevo Idioma</h2>
+      <input type="hidden" id="item-id">
+      <input type="text" id="item-nombre" placeholder="Nombre del idioma">
+      <button onclick="guardarItem()">Guardar</button>
+    </div>
+  </div>
+
+  <script src="../js/idiomas.js"></script>
+</body>
+</html>

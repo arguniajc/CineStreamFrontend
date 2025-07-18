@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Actores - CRUD Moderno</title>
+  <link rel="stylesheet" href="../css/actores.css">
+</head>
+<body>
+  <header>
+    <h1>Gestión de Actores</h1>
+  </header>
+
+  <div class="container">
+    <div class="actions">
+      <button onclick="abrirModal()">Agregar Actor</button>
+    </div>
+
+    <div class="grid" id="contenedor-actores"></div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h2 id="modal-titulo">Nuevo Actor</h2>
+      <input type="hidden" id="actor-id">
+      <input type="text" id="actor-nombre" placeholder="Nombre del actor">
+      <input type="text" id="actor-imagen" placeholder="URL de la imagen">
+      <button onclick="guardarActor()">Guardar</button>
+    </div>
+  </div>
+
+  <script src="../js/actores.js"></script>
+</body>
+</html>

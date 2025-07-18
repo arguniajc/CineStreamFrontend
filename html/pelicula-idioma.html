@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Película - Idioma</title>
+  <link rel="stylesheet" href="../css/pelicula-idioma.css">
+</head>
+<body>
+  <h1>Relación Película - Idioma</h1>
+  <div id="mensajeError"></div>
+  <button id="btnAgregar">Agregar relación</button>
+  <div id="lista"></div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h3>Agregar relación</h3>
+      <select id="selectPelicula"></select>
+      <select id="selectIdioma"></select>
+      <button onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+
+  <script src="../js/pelicula-idioma.js"></script>
+</body>
+</html>

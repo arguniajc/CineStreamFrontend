@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Película - Actor</title>
+  <link rel="stylesheet" href="../css/pelicula-actor.css">
+</head>
+<body>
+  <h1>Relación Película - Actor</h1>
+  <div id="mensajeError"></div>
+  <button id="btnAgregar">Agregar personaje</button>
+  <div id="lista"></div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h3 id="modal-title">Agregar personaje</h3>
+      <select id="selectPelicula"></select>
+      <select id="selectActor"></select>
+      <input type="text" id="personaje" placeholder="Nombre del personaje">
+      <button onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+
+  <script src="../js/pelicula-actor.js"></script>
+</body>
+</html>

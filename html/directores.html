@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Directores - CRUD Moderno</title>
+  <link rel="stylesheet" href="../css/directores.css">
+</head>
+<body>
+  <header>
+    <h1>Gestión de Directores</h1>
+  </header>
+
+  <div class="container">
+    <div class="actions">
+      <button onclick="abrirModal()">Agregar Director</button>
+    </div>
+    <div class="grid" id="contenedor"></div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h2 id="modal-titulo">Nuevo Director</h2>
+      <input type="hidden" id="item-id">
+      <input type="text" id="item-nombre" placeholder="Nombre del director">
+      <input type="text" id="item-imagen" placeholder="URL de la imagen">
+      <button onclick="guardarItem()">Guardar</button>
+    </div>
+  </div>
+
+  <script src="../js/directores.js"></script>
+</body>
+</html>

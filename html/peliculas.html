@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Películas</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background-color: #f0f2f5;
+    }
+
+    header {
+      background: #1a73e8;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      width: 280px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    .card-image-container {
+      width: 100%;
+      height: 350px;
+      background-color: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-content {
+      padding: 1rem;
+      flex-grow: 1;
+    }
+
+    .card-content h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    .card-content p {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem 1rem;
+      gap: 0.5rem;
+    }
+
+    .card-actions button {
+      flex: 1;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: #1a73e8;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .add-button {
+      margin: 2rem;
+      background-color: #28a745;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .modal-content input,
+    .modal-content textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #888;
+      font-weight: bold;
+    }
+
+    #mensajeModal .modal-content {
+      max-width: 400px;
+      text-align: center;
+    }
+
+    #mensajeModal h2 {
+      font-size: 1.2rem;
+    }
+
+    .relacion {
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Películas</h1>
+  </header>
+
+  <button class="add-button" onclick="openModal()">+ Agregar Película</button>
+  <div class="container" id="peliculasContainer"></div>
+
+  <!-- Modal Formulario -->
+  <div class="modal" id="peliculaModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">×</span>
+      <h2 id="modalTitle">Nueva Película</h2>
+      <form id="peliculaForm">
+        <input type="hidden" id="peliculaId" />
+        <input type="text" id="titulo_espanol" placeholder="Título Español" required />
+        <input type="text" id="titulo_original" placeholder="Título Original" required />
+        <input type="number" id="ano_estreno" placeholder="Año de Estreno" required />
+        <input type="text" id="pais" placeholder="País" />
+        <input type="number" id="duracion" placeholder="Duración (min)" />
+        <input type="text" id="calificacion" placeholder="Calificación" />
+        <input type="date" id="fecha_estreno" />
+        <input type="url" id="imagen_portada" placeholder="URL Imagen" />
+        <input type="url" id="trailer_url" placeholder="URL Trailer" />
+        <textarea id="sinopsis" placeholder="Sinopsis" rows="4"></textarea>
+        <button type="submit">Guardar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Mensaje -->
+  <div class="modal" id="mensajeModal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarMensaje()">×</span>
+      <h2 id="mensajeTexto"></h2>
+    </div>
+  </div>
+
+  <!-- Modal Detalle -->
+  <div class="modal" id="detalleModal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarDetalle()">×</span>
+      <div id="detalleContenido"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:3000/api/peliculas";
+    const container = document.getElementById("peliculasContainer");
+    const modal = document.getElementById("peliculaModal");
+    const form = document.getElementById("peliculaForm");
+
+    const mensajeModal = document.getElementById("mensajeModal");
+    const mensajeTexto = document.getElementById("mensajeTexto");
+
+    const fields = [
+      "titulo_espanol", "titulo_original", "ano_estreno",
+      "pais", "duracion", "calificacion", "fecha_estreno",
+      "imagen_portada", "trailer_url", "sinopsis"
+    ];
+
+    async function cargarPeliculas() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        container.innerHTML = "";
+
+        data.forEach(pelicula => {
+          const card = document.createElement("div");
+          card.className = "card";
+
+          card.innerHTML = `
+            <div class="card-image-container">
+              <img src="${pelicula.imagen_portada}" alt="Imagen de ${pelicula.titulo_espanol}" />
+            </div>
+            <div class="card-content">
+              <h3>${pelicula.titulo_espanol}</h3>
+              <p><strong>Año:</strong> ${pelicula.ano_estreno}</p>
+              <p><strong>País:</strong> ${pelicula.pais}</p>
+            </div>
+            <div class="card-actions">
+              <button onclick='editar(${JSON.stringify(pelicula)})'>Editar</button>
+              <button onclick='eliminar(${pelicula.id})' style="background:#dc3545">Eliminar</button>
+            </div>
+          `;
+
+          card.addEventListener("click", (e) => {
+            if (e.target.tagName === "BUTTON") return;
+            mostrarDetalle(pelicula);
+          });
+
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error("Error al cargar películas:", error);
+        mostrarMensaje("Error al cargar las películas.");
+      }
+    }
+
+    function mostrarDetalle(pelicula) {
+      const detalle = document.getElementById("detalleContenido");
+      detalle.innerHTML = `
+        <h2>${pelicula.titulo_espanol}</h2>
+        <img src="${pelicula.imagen_portada}" alt="Imagen" style="width:100%; max-height:200px; object-fit:cover;" />
+        <p><strong>Título Original:</strong> ${pelicula.titulo_original}</p>
+        <p><strong>Año:</strong> ${pelicula.ano_estreno}</p>
+        <p><strong>País:</strong> ${pelicula.pais}</p>
+        <p><strong>Duración:</strong> ${pelicula.duracion}</p>
+        <p><strong>Calificación:</strong> ${pelicula.calificacion}</p>
+        <p><strong>Fecha Estreno:</strong> ${pelicula.fecha_estreno}</p>
+        <p><strong>Sinopsis:</strong> ${pelicula.sinopsis}</p>
+        <p><a href="${pelicula.trailer_url}" target="_blank">Ver Trailer</a></p>
+        <hr/>
+        <div class="relacion"><strong>Director:</strong> ${pelicula.director?.nombre || "N/A"}</div>
+        <div class="relacion"><strong>Idioma:</strong> ${pelicula.idioma?.nombre || "N/A"}</div>
+        <div class="relacion"><strong>Géneros:</strong> ${(pelicula.generos || []).map(g => g.nombre).join(", ")}</div>
+        <div class="relacion"><strong>Actores:</strong> ${(pelicula.actores || []).map(a => a.nombre).join(", ")}</div>
+        <div class="relacion"><strong>Compañías:</strong> ${(pelicula.companias || []).map(c => c.nombre).join(", ")}</div>
+      `;
+      document.getElementById("detalleModal").style.display = "flex";
+    }
+
+    function openModal(pelicula = null) {
+      modal.style.display = "flex";
+      document.getElementById("modalTitle").innerText = pelicula ? "Editar Película" : "Nueva Película";
+      document.getElementById("peliculaId").value = pelicula?.id || "";
+
+      if (!pelicula) {
+        form.reset();
+        return;
+      }
+
+      fields.forEach(f => {
+        const el = document.getElementById(f);
+        if (el) el.value = pelicula[f] ?? "";
+      });
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+      form.reset();
+      document.getElementById("peliculaId").value = "";
+    }
+
+    function cerrarDetalle() {
+      document.getElementById("detalleModal").style.display = "none";
+    }
+
+    function mostrarMensaje(texto) {
+      mensajeTexto.textContent = texto;
+      mensajeModal.style.display = "flex";
+    }
+
+    function cerrarMensaje() {
+      mensajeModal.style.display = "none";
+    }
+
+    function editar(pelicula) {
+      openModal(pelicula);
+    }
+
+    async function eliminar(id) {
+      if (!confirm("¿Estás seguro de eliminar esta película?")) return;
+      try {
+        await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        cargarPeliculas();
+        mostrarMensaje("Película eliminada correctamente.");
+      } catch (err) {
+        mostrarMensaje("Error al eliminar: " + err.message);
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById("peliculaId").value;
+      const payload = {};
+
+      fields.forEach(f => {
+        const el = document.getElementById(f);
+        payload[f] = el.type === "number" ? Number(el.value) : el.value;
+      });
+
+      const method = id ? "PUT" : "POST";
+      const url = id ? `${API_URL}/${id}` : API_URL;
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          mostrarMensaje("Error al guardar: " + (result.message || res.statusText));
+          return;
+        }
+
+        closeModal();
+        cargarPeliculas();
+        mostrarMensaje("Película guardada con éxito.");
+      } catch (err) {
+        mostrarMensaje("Error de conexión: " + err.message);
+      }
+    });
+
+    cargarPeliculas();
+  </script>
+</body>
+</html>

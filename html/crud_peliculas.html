@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Crear Película</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+    form {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    textarea {
+      resize: vertical;
+    }
+    .inline-inputs {
+      display: flex;
+      gap: 10px;
+    }
+    .inline-inputs input {
+      flex: 1;
+    }
+    input:invalid {
+      border-color: red;
+    }
+  </style>
+</head>
+<body>
+  <form id="formPelicula" novalidate>
+    <h1>Crear Película</h1>
+
+    <label for="titulo_espanol">Título español:</label>
+    <input type="text" id="titulo_espanol" required />
+
+    <label for="titulo_original">Título original:</label>
+    <input type="text" id="titulo_original" required />
+
+    <label for="ano_estreno">Año de estreno (1990-2050):</label>
+    <input type="number" id="ano_estreno" min="1990" max="2050" required />
+
+    <label>Duración:</label>
+    <div class="inline-inputs">
+      <input type="number" id="duracion_horas" min="0" placeholder="Horas" required />
+      <input type="number" id="duracion_minutos" min="0" max="59" placeholder="Minutos" required />
+    </div>
+
+    <label for="calificacion">Calificación (1.0 - 10.0):</label>
+    <input type="number" id="calificacion" step="0.1" min="1.0" max="10.0" required />
+
+    <label for="fecha_estreno">Fecha estreno:</label>
+    <input type="date" id="fecha_estreno" required />
+
+    <label for="sinopsis">Sinopsis:</label>
+    <textarea id="sinopsis" required></textarea>
+
+    <label for="trailer_url">Trailer URL:</label>
+    <input type="url" id="trailer_url" required />
+
+    <label for="pais">País:</label>
+    <input type="text" id="pais" required />
+
+    <label for="imagen_portada">Imagen portada URL:</label>
+    <input type="url" id="imagen_portada" required />
+
+    <button type="submit">Guardar Película</button>
+  </form>
+
+  <script>
+    const form = document.getElementById("formPelicula");
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const tituloEspanol = document.getElementById("titulo_espanol").value.trim();
+      const tituloOriginal = document.getElementById("titulo_original").value.trim();
+      const anio = parseInt(document.getElementById("ano_estreno").value);
+      const horas = parseInt(document.getElementById("duracion_horas").value);
+      const minutos = parseInt(document.getElementById("duracion_minutos").value);
+      let calificacion = parseFloat(document.getElementById("calificacion").value);
+      const fechaEstreno = document.getElementById("fecha_estreno").value;
+      const sinopsis = document.getElementById("sinopsis").value.trim();
+      const trailerUrl = document.getElementById("trailer_url").value.trim();
+      const pais = document.getElementById("pais").value.trim();
+      const imagenPortada = document.getElementById("imagen_portada").value.trim();
+
+      if (!tituloEspanol || !tituloOriginal || !anio || !fechaEstreno || !sinopsis || !trailerUrl || !pais || !imagenPortada) {
+        alert("Todos los campos son obligatorios.");
+        return;
+      }
+
+      if (isNaN(anio) || anio < 1990 || anio > 2050) {
+        alert("El año debe estar entre 1990 y 2050.");
+        return;
+      }
+
+      if (isNaN(horas) || isNaN(minutos) || horas < 0 || minutos < 0 || minutos > 59) {
+        alert("Duración inválida.");
+        return;
+      }
+
+      const duracion = horas * 60 + minutos;
+      if (duracion <= 0 || duracion > 1000) {
+        alert("La duración debe estar entre 1 y 1000 minutos.");
+        return;
+      }
+
+      if (isNaN(calificacion)) {
+        alert("Calificación inválida.");
+        return;
+      }
+
+      if (calificacion > 10) calificacion = 10;
+      if (calificacion < 1) calificacion = 1;
+
+      calificacion = parseFloat(calificacion.toFixed(1));
+
+      const data = {
+        titulo_espanol: tituloEspanol,
+        titulo_original: tituloOriginal,
+        ano_estreno: anio,
+        duracion: duracion,
+        calificacion: calificacion,
+        fecha_estreno: fechaEstreno,
+        sinopsis: sinopsis,
+        pais: pais,
+        trailer_url: trailerUrl,
+        imagen_portada: imagenPortada
+      };
+
+      console.log("📦 Enviando JSON:", JSON.stringify(data, null, 2));
+
+      try {
+        const response = await fetch("http://localhost:3000/api/peliculas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          alert("❌ Error: " + result.error);
+        } else {
+          const idPelicula = result.id || result._id || result.peliculaId;
+          window.location.href = `agregar_actores.html?peliculaId=${encodeURIComponent(idPelicula)}`;
+        }
+      } catch (error) {
+        alert("⚠️ Error creando película: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
