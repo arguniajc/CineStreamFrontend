@@ -99,7 +99,7 @@
   <p id="peliculaIdInfo"></p>
 
   <label for="directorSelect">Selecciona un director:</label>
-  <select id="directorSelect">
+  <select id="directorSelect" aria-label="Directores disponibles">
     <option value="">-- Selecciona un director --</option>
   </select>
 
@@ -110,7 +110,6 @@
   <h2>Directores Asociados:</h2>
   <div id="listaDirectores" class="card-container"></div>
 
-  <!-- Botón Siguiente -->
   <button id="btnSiguiente">Siguiente: Agregar Compañías</button>
 
   <script>
@@ -120,7 +119,6 @@
     const directorSelect = document.getElementById("directorSelect");
     const listaDirectores = document.getElementById("listaDirectores");
     const mensaje = document.getElementById("mensaje");
-
     const directoresCargados = {};
 
     document.getElementById("peliculaIdInfo").textContent = "Película ID: " + peliculaId;
@@ -148,13 +146,9 @@
         const datos = await response.json();
 
         const relacionados = datos.filter(item => item.id_pelicula == peliculaId);
-
-        if (relacionados.length === 0) {
-          listaDirectores.innerHTML = "<p>No hay directores asociados a esta película.</p>";
-          return;
-        }
-
-        listaDirectores.innerHTML = "";
+        listaDirectores.innerHTML = relacionados.length === 0
+          ? "<p>No hay directores asociados a esta película.</p>"
+          : "";
 
         relacionados.forEach(item => {
           const card = document.createElement("div");
@@ -163,21 +157,21 @@
           const img = document.createElement("img");
           img.src = item.imagen_director || "https://via.placeholder.com/200x200?text=Sin+Imagen";
           img.alt = item.nombre_director;
-          img.style.width = "100%";
-          img.style.height = "220px";
-          img.style.objectFit = "cover";
-          img.style.borderRadius = "5px";
-          img.style.marginBottom = "10px";
+          Object.assign(img.style, {
+            width: "100%",
+            height: "220px",
+            objectFit: "cover",
+            borderRadius: "5px",
+            marginBottom: "10px"
+          });
 
           const h4 = document.createElement("h4");
           h4.textContent = item.nombre_director;
 
           card.appendChild(img);
           card.appendChild(h4);
-
           listaDirectores.appendChild(card);
         });
-
       } catch (err) {
         mensaje.innerHTML = `<span class="error">⚠️ Error al cargar directores de la película: ${err.message}</span>`;
       }
@@ -188,6 +182,15 @@
 
       if (!peliculaId || !directorId) {
         mensaje.innerHTML = `<span class="error">❌ Debes seleccionar un director válido.</span>`;
+        return;
+      }
+
+      // Evitar duplicado
+      const yaExiste = [...document.querySelectorAll(".director-card h4")].some(
+        el => el.textContent === directoresCargados[directorId].nombre
+      );
+      if (yaExiste) {
+        mensaje.innerHTML = `<span class="error">⚠️ Este director ya está asociado a la película.</span>`;
         return;
       }
 
@@ -206,7 +209,7 @@
         const result = await response.json();
 
         if (!response.ok) {
-          mensaje.innerHTML = `<span class="error">❌ Error: ${result.error || 'Error inesperado.'}</span>`;
+          mensaje.innerHTML = `<span class="error">❌ Error del servidor: ${result?.error?.detail || result.message || "Error inesperado"}</span>`;
           return;
         }
 
@@ -218,7 +221,6 @@
       }
     });
 
-    // Redirección al siguiente paso
     document.getElementById("btnSiguiente").addEventListener("click", () => {
       if (peliculaId) {
         window.location.href = `agregar-companias.html?peliculaId=${peliculaId}`;
