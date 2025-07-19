@@ -1,0 +1,273 @@
+
+    /* Variables de diseño - Tema oscuro */
+    :root {
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --secondary: #f59e0b;
+      --error: #ef4444;
+      --success: #10b981;
+      --text: #e5e7eb;
+      --text-light: #9ca3af;
+      --bg: #111827;
+      --card-bg: #1f2937;
+      --border: #374151;
+      --radius: 0.5rem;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      --transition: all 0.3s ease;
+    }
+
+    /* Estilos base */
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Contenedor principal */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Encabezados */
+    h1, h2 {
+      color: var(--text);
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    h1::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background: var(--primary);
+      margin-top: 0.75rem;
+      border-radius: 2px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin: 2rem 0 1rem;
+      font-weight: 600;
+    }
+
+    /* Sección de información */
+    .info-pelicula {
+      background-color: rgba(59, 130, 246, 0.1);
+      border-left: 4px solid var(--primary);
+      padding: 1rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-pelicula i {
+      color: var(--primary);
+    }
+
+    /* Formulario */
+    .form-group {
+      background-color: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.875rem;
+    }
+
+    select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.9375rem;
+      transition: var(--transition);
+      box-sizing: border-box;
+      background-color: rgba(17, 24, 39, 0.5);
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+      background-color: rgba(17, 24, 39, 0.7);
+    }
+
+    /* Botones */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #0e9f6e;
+      transform: translateY(-1px);
+    }
+
+    /* Mensajes de feedback */
+    .feedback {
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: var(--radius);
+      font-weight: 500;
+    }
+
+    .success {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border-left: 4px solid var(--success);
+    }
+
+    .error {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      border-left: 4px solid var(--error);
+    }
+
+    /* Tarjetas de compañías */
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .compania-card {
+      background-color: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: var(--transition);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .compania-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .compania-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: contain;
+      padding: 1.5rem;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .compania-card-content {
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .compania-card h4 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+
+    .compania-card p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--text-light);
+      font-style: italic;
+    }
+
+    /* Mensaje cuando no hay compañías */
+    .empty-message {
+      color: var(--text-light);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+      grid-column: 1 / -1;
+    }
+
+    /* Sección de acciones */
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      gap: 1rem;
+    }
+
+    /* Form row */
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .form-col {
+      flex: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .card-container {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+      
+      .form-row {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .actions {
+        flex-direction: column;
+      }
+    }

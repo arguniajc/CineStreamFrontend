@@ -1,360 +1,137 @@
-const api = "http://localhost:3000/api/peliculas";
-const tabla = document.getElementById("tabla");
-const modal = document.getElementById("modal");
 
-// NUEVOS SELECTS Y CONTENEDORES
-const selectGeneros = document.getElementById("generos");
-const selectCompanias = document.getElementById("companias");
-const selectIdiomas = document.getElementById("idiomas");
-const selectDirectores = document.getElementById("directores");
-const actoresContainer = document.getElementById("actores-container");
+// Vista previa de la imagen
+const imagenPortadaInput = document.getElementById('imagen_portada');
+const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+const imagePreview = document.getElementById('imagePreview');
 
-let actoresOptions = [];
-
-// Cargar opciones al abrir el modal
-async function cargarOpcionesRelacion() {
-  // Cargar géneros
-  const generos = await fetch("http://localhost:3000/api/genero").then(r => r.json());
-  selectGeneros.innerHTML = generos.map(g => `<option value="${g.id}">${g.nombre}</option>`).join("");
-
-  // Cargar compañías
-  const companias = await fetch("http://localhost:3000/api/compania").then(r => r.json());
-  selectCompanias.innerHTML = companias.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("");
-
-  // Cargar idiomas
-  const idiomas = await fetch("http://localhost:3000/api/idioma").then(r => r.json());
-  selectIdiomas.innerHTML = idiomas.map(i => `<option value="${i.id}">${i.nombre}</option>`).join("");
-
-  // Cargar directores
-  const directores = await fetch("http://localhost:3000/api/directores").then(r => r.json());
-  selectDirectores.innerHTML = directores.map(d => `<option value="${d.id}">${d.nombre}</option>`).join("");
-
-  // Cargar actores (para selects individuales)
-  actoresOptions = await fetch("http://localhost:3000/api/actores").then(r => r.json());
-  // Si no hay ningún campo de actor, agregar uno por defecto
-  if (actoresContainer.childElementCount === 0) agregarActorCampo();
-}
-
-function agregarActorCampo() {
-  const row = document.createElement("div");
-  row.className = "actor-personaje-row";
-  // Select de actor
-  const select = document.createElement("select");
-  select.innerHTML = `<option value="">Seleccione actor</option>` + actoresOptions.map(a => `<option value="${a.id}">${a.nombre}</option>`).join("");
-  // Input de personaje
-  const input = document.createElement("input");
-  input.type = "text";
-  input.placeholder = "Personaje";
-  // Botón eliminar
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.textContent = "Eliminar";
-  btn.onclick = () => row.remove();
-  row.appendChild(select);
-  row.appendChild(input);
-  row.appendChild(btn);
-  actoresContainer.appendChild(row);
-}
-
-const cargar = async () => {
-  const res = await fetch(api);
-  const data = await res.json();
-  tabla.innerHTML = "";
-  data.forEach(p => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${p.id}</td>
-      <td>${p.titulo_espanol}</td>
-      <td>${p.ano_estreno}</td>
-      <td>${p.pais}</td>
-      <td>
-        <button onclick='editar(${JSON.stringify(p)})'>Editar</button>
-        <button onclick='eliminar(${p.id})'>Eliminar</button>
-      </td>
-    `;
-    tabla.appendChild(tr);
-  });
-};
-
-let pasoActual = 1;
-const totalPasos = 6;
-
-function mostrarPaso(n) {
-  document.querySelectorAll('.modal-step').forEach((step, i) => {
-    step.classList.toggle('active', i === n - 1);
-  });
-  document.getElementById('btn-prev').style.display = n === 1 ? 'none' : '';
-  document.getElementById('btn-next').style.display = n === totalPasos ? 'none' : '';
-  document.getElementById('btn-crear').style.display = n === totalPasos ? '' : 'none';
-}
-
-let peliculaIdCreada = null;
-
-async function cambiarPaso(dir) {
-  // Antes de avanzar de cada paso, ejecuta la acción correspondiente
-  if (dir === 1) {
-    if (pasoActual === 1) {
-      // Crear película y guardar id
-      const datos = {
-        titulo_espanol: titulo_espanol.value.trim(),
-        titulo_original: titulo_original.value.trim(),
-        ano_estreno: parseInt(ano_estreno.value),
-        pais: pais.value.trim(),
-        duracion: parseInt(duracion.value),
-        calificacion: calificacion.value.trim(),
-        fecha_estreno: fecha_estreno.value,
-        imagen_portada: imagen_portada.value.trim(),
-        trailer_url: trailer_url.value.trim(),
-        sinopsis: sinopsis.value.trim(),
-      };
-      // Validar títulos
-      if (!datos.titulo_espanol || !datos.titulo_original) {
-        alert("Debes ingresar el título en español y el título original.");
-        return;
-      }
-      // Validar campos obligatorios
-      if (isNaN(datos.ano_estreno) || !datos.pais || isNaN(datos.duracion)) {
-        alert("Completa todos los campos obligatorios: año, país y duración.");
-        return;
-      }
-      console.log("Enviando datos para crear película:", datos);
-      alert("JSON enviado al API:\n" + JSON.stringify(datos, null, 2));
-      const response = await fetch(api, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datos)
-      });
-      if (!response.ok) {
-        let msg = "Error al guardar película";
-        try {
-          const err = await response.json();
-          msg += ": " + JSON.stringify(err);
-        } catch (e) {
-          msg += ": " + response.status + " " + response.statusText;
-        }
-        alert(msg);
-        console.error("Error al guardar película:", response);
-        return;
-      }
-      const pelicula = await response.json();
-      peliculaIdCreada = pelicula.id;
-      console.log("Película creada con id:", peliculaIdCreada);
-    }
-    if (pasoActual === 2) {
-      // Crear relaciones de actores
-      const actores = Array.from(actoresContainer.children).map(row => {
-        const [select, input] = row.querySelectorAll("select, input");
-        return { id: select.value, personaje: input.value };
-      }).filter(a => a.id && a.personaje);
-      for (const actor of actores) {
-        await fetch(`http://localhost:3000/api/pelicula-actor/${peliculaIdCreada}/${actor.id}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ personaje: actor.personaje })
-        });
-      }
-    }
-    if (pasoActual === 3) {
-      // Crear relaciones de directores
-      const directores = Array.from(selectDirectores.selectedOptions).map(opt => opt.value);
-      for (const directorId of directores) {
-        await fetch(`http://localhost:3000/api/pelicula_director/${peliculaIdCreada}/${directorId}`, {
-          method: "POST" });
-      }
-    }
-    if (pasoActual === 4) {
-      // Crear relaciones de compañías
-      const companias = Array.from(selectCompanias.selectedOptions).map(opt => opt.value);
-      for (const companiaId of companias) {
-        await fetch(`http://localhost:3000/api/pelicula-compania/${peliculaIdCreada}/${companiaId}`, {
-          method: "POST" });
-      }
-    }
-    if (pasoActual === 5) {
-      // Crear relaciones de géneros
-      const generos = Array.from(selectGeneros.selectedOptions).map(opt => opt.value);
-      for (const generoId of generos) {
-        await fetch(`http://localhost:3000/api/pelicula-genero/${peliculaIdCreada}/${generoId}`, {
-          method: "POST" });
-      }
-    }
-    if (pasoActual === 6) {
-      // Crear relaciones de idiomas
-      const idiomas = Array.from(selectIdiomas.selectedOptions).map(opt => opt.value);
-      for (const idiomaId of idiomas) {
-        await fetch(`http://localhost:3000/api/pelicula-idioma/${peliculaIdCreada}/${idiomaId}`, {
-          method: "POST" });
-      }
-    }
+imagenPortadaInput.addEventListener('input', function() {
+  const url = this.value.trim();
+  if (url) {
+    imagePreview.src = url;
+    imagePreviewContainer.style.display = 'block';
+    
+    // Verificar si la imagen carga correctamente
+    imagePreview.onload = function() {
+      imagePreviewContainer.style.display = 'block';
+    };
+    
+    imagePreview.onerror = function() {
+      imagePreviewContainer.style.display = 'none';
+    };
+  } else {
+    imagePreviewContainer.style.display = 'none';
   }
-  pasoActual += dir;
-  if (pasoActual < 1) pasoActual = 1;
-  if (pasoActual > totalPasos) pasoActual = totalPasos;
-  mostrarPaso(pasoActual);
-}
+});
 
-const abrirModal = () => {
-  document.getElementById("modal-titulo").textContent = "Nueva Película";
-  document.querySelectorAll("#modal input, #modal textarea").forEach(el => el.value = "");
-  [selectGeneros, selectCompanias, selectIdiomas, selectDirectores].forEach(sel => sel.selectedIndex = -1);
-  actoresContainer.innerHTML = "";
-  cargarOpcionesRelacion();
-  pasoActual = 1;
-  mostrarPaso(pasoActual);
-  document.getElementById('mensaje-exito').style.display = 'none';
-  modal.style.display = "block";
-};
+// Toggle de tema (opcional)
+const themeToggle = document.getElementById('themeToggle');
+const html = document.documentElement;
 
-const cerrarModal = () => {
-  modal.style.display = "none";
-};
+themeToggle.addEventListener('click', function() {
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+  
+  // Cambiar variables CSS según el tema
+  if (isDark) {
+    // Tema claro
+    document.documentElement.style.setProperty('--text', '#333333');
+    document.documentElement.style.setProperty('--text-light', '#6b7280');
+    document.documentElement.style.setProperty('--bg', '#f9fafb');
+    document.documentElement.style.setProperty('--card-bg', '#ffffff');
+    document.documentElement.style.setProperty('--border', '#e5e7eb');
+    document.documentElement.style.setProperty('--preview-bg', '#f3f4f6');
+  } else {
+    // Tema oscuro
+    document.documentElement.style.setProperty('--text', '#e5e7eb');
+    document.documentElement.style.setProperty('--text-light', '#9ca3af');
+    document.documentElement.style.setProperty('--bg', '#111827');
+    document.documentElement.style.setProperty('--card-bg', '#1f2937');
+    document.documentElement.style.setProperty('--border', '#374151');
+    document.documentElement.style.setProperty('--preview-bg', '#111827');
+  }
+});
 
-const guardar = async () => {
-  // 1. Datos de película
-  const datos = {
-    titulo_espanol: titulo_espanol.value,
-    titulo_original: titulo_original.value,
-    ano_estreno: parseInt(ano_estreno.value),
-    pais: pais.value,
-    duracion: parseInt(duracion.value),
-    calificacion: calificacion.value,
-    fecha_estreno: fecha_estreno.value,
-    imagen_portada: imagen_portada.value,
-    trailer_url: trailer_url.value,
-    sinopsis: sinopsis.value,
-  };
+// Mantener la lógica original del formulario
+const form = document.getElementById("formPelicula");
 
-  const id = document.getElementById("id").value;
-  const url = id ? `${api}/${id}` : api;
-  const method = id ? "PUT" : "POST";
+form.addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-  // 2. Relaciones (obligatorio al menos 1)
-  const generos = Array.from(selectGeneros.selectedOptions).map(opt => opt.value);
-  const companias = Array.from(selectCompanias.selectedOptions).map(opt => opt.value);
-  const idiomas = Array.from(selectIdiomas.selectedOptions).map(opt => opt.value);
-  const directores = Array.from(selectDirectores.selectedOptions).map(opt => opt.value);
-  // Actores y personajes
-  const actores = Array.from(actoresContainer.children).map(row => {
-    const [select, input] = row.querySelectorAll("select, input");
-    return { id: select.value, personaje: input.value };
-  }).filter(a => a.id && a.personaje);
+  const tituloEspanol = document.getElementById("titulo_espanol").value.trim();
+  const tituloOriginal = document.getElementById("titulo_original").value.trim();
+  const anio = parseInt(document.getElementById("ano_estreno").value);
+  const horas = parseInt(document.getElementById("duracion_horas").value);
+  const minutos = parseInt(document.getElementById("duracion_minutos").value);
+  let calificacion = parseFloat(document.getElementById("calificacion").value);
+  const fechaEstreno = document.getElementById("fecha_estreno").value;
+  const sinopsis = document.getElementById("sinopsis").value.trim();
+  const trailerUrl = document.getElementById("trailer_url").value.trim();
+  const pais = document.getElementById("pais").value.trim();
+  const imagenPortada = document.getElementById("imagen_portada").value.trim();
 
-  if (
-    generos.length === 0 &&
-    companias.length === 0 &&
-    idiomas.length === 0 &&
-    directores.length === 0 &&
-    actores.length === 0
-  ) {
-    alert("Selecciona al menos un género, compañía, idioma, director o actor con personaje.");
+  if (!tituloEspanol || !tituloOriginal || !anio || !fechaEstreno || !sinopsis || !trailerUrl || !pais || !imagenPortada) {
+    alert("Todos los campos son obligatorios.");
     return;
   }
 
-  // 3. Guardar película principal
-  let peliculaId = id;
-  let response;
-  if (!id) {
-    response = await fetch(url, {
-      method,
+  if (isNaN(anio) || anio < 1990 || anio > 2050) {
+    alert("El año debe estar entre 1990 y 2050.");
+    return;
+  }
+
+  if (isNaN(horas) || isNaN(minutos) || horas < 0 || minutos < 0 || minutos > 59) {
+    alert("Duración inválida.");
+    return;
+  }
+
+  const duracion = horas * 60 + minutos;
+  if (duracion <= 0 || duracion > 1000) {
+    alert("La duración debe estar entre 1 y 1000 minutos.");
+    return;
+  }
+
+  if (isNaN(calificacion)) {
+    alert("Calificación inválida.");
+    return;
+  }
+
+  if (calificacion > 10) calificacion = 10;
+  if (calificacion < 1) calificacion = 1;
+
+  calificacion = parseFloat(calificacion.toFixed(1));
+
+  const data = {
+    titulo_espanol: tituloEspanol,
+    titulo_original: tituloOriginal,
+    ano_estreno: anio,
+    duracion: duracion,
+    calificacion: calificacion,
+    fecha_estreno: fechaEstreno,
+    sinopsis: sinopsis,
+    pais: pais,
+    trailer_url: trailerUrl,
+    imagen_portada: imagenPortada
+  };
+
+  console.log("📦 Enviando JSON:", JSON.stringify(data, null, 2));
+
+  try {
+    const response = await fetch("http://localhost:3000/api/peliculas", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datos)
+      body: JSON.stringify(data)
     });
+
+    const result = await response.json();
+
     if (!response.ok) {
-      let msg = "Error al guardar película";
-      try {
-        const err = await response.json();
-        if (err && (err.detalle || err.message)) msg += ": " + (err.detalle || err.message);
-      } catch (e) {}
-      alert(msg);
-      // Mostrar detalles en consola
-      console.error("Respuesta error película:", response);
-      return;
+      alert("❌ Error: " + result.error);
+    } else {
+      const idPelicula = result.id || result._id || result.peliculaId;
+      window.location.href = `agregar_actores.html?peliculaId=${encodeURIComponent(idPelicula)}`;
     }
-    const pelicula = await response.json();
-    peliculaId = pelicula.id;
-  } else {
-    // Editar película (no se actualizan relaciones en este ejemplo)
-    await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datos)
-    });
+  } catch (error) {
+    alert("⚠️ Error creando película: " + error.message);
   }
-
-  // 4. Guardar relaciones (solo si es creación)
-  if (!id) {
-    // Géneros
-    for (const generoId of generos) {
-      await fetch(`http://localhost:3000/api/pelicula-genero`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_pelicula: peliculaId, id_genero: generoId })
-      });
-    }
-    // Compañías
-    for (const companiaId of companias) {
-      await fetch(`http://localhost:3000/api/pelicula-compania`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_pelicula: peliculaId, id_compania: companiaId })
-      });
-    }
-    // Idiomas
-    for (const idiomaId of idiomas) {
-      await fetch(`http://localhost:3000/api/pelicula-idioma`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_pelicula: peliculaId, id_idioma: idiomaId })
-      });
-    }
-    // Directores
-    for (const directorId of directores) {
-      await fetch(`http://localhost:3000/api/pelicula_director`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_pelicula: peliculaId, id_director: directorId })
-      });
-    }
-    // Actores y personajes
-    for (const actor of actores) {
-      await fetch(`http://localhost:3000/api/pelicula-actor`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_pelicula: peliculaId, id_actor: actor.id, personaje: actor.personaje })
-      });
-    }
-  }
-
-  document.getElementById('mensaje-exito').style.display = 'block';
-  setTimeout(() => {
-    cerrarModal();
-    cargar();
-  }, 1200);
-};
-
-const editar = (p) => {
-  document.getElementById("modal-titulo").textContent = "Editar Película";
-  id.value = p.id;
-  titulo_espanol.value = p.titulo_espanol || "";
-  titulo_original.value = p.titulo_original || "";
-  ano_estreno.value = p.ano_estreno || "";
-  pais.value = p.pais || "";
-  duracion.value = p.duracion || "";
-  calificacion.value = p.calificacion || "";
-  fecha_estreno.value = p.fecha_estreno || "";
-  imagen_portada.value = p.imagen_portada || "";
-  trailer_url.value = p.trailer_url || "";
-  sinopsis.value = p.sinopsis || "";
-  modal.style.display = "block";
-};
-
-const eliminar = async (id) => {
-  if (confirm("¿Eliminar esta película?")) {
-    await fetch(`${api}/${id}`, { method: "DELETE" });
-    cargar();
-  }
-};
-
-window.onclick = e => { if (e.target === modal) cerrarModal(); };
-
-cargar();
+});

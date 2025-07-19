@@ -14,7 +14,6 @@
   --radius: 0.5rem;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
   --transition: all 0.3s ease;
-  --preview-bg: #111827;
 }
 
 /* Estilos base */
@@ -96,7 +95,7 @@ label {
   font-size: 0.875rem;
 }
 
-select, input[type="text"] {
+select {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid var(--border);
@@ -109,7 +108,7 @@ select, input[type="text"] {
   margin-bottom: 1rem;
 }
 
-select:focus, input[type="text"]:focus {
+select:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
@@ -141,13 +140,13 @@ select:focus, input[type="text"]:focus {
   transform: translateY(-1px);
 }
 
-.btn-secondary {
-  background-color: var(--secondary);
-  color: #1f2937;
+.btn-success {
+  background-color: var(--success);
+  color: white;
 }
 
-.btn-secondary:hover {
-  background-color: #e69009;
+.btn-success:hover {
+  background-color: #0e9f6e;
   transform: translateY(-1px);
 }
 
@@ -171,7 +170,7 @@ select:focus, input[type="text"]:focus {
   border-left: 4px solid var(--error);
 }
 
-/* Tarjetas de actores */
+/* Tarjetas de idiomas */
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -179,49 +178,47 @@ select:focus, input[type="text"]:focus {
   margin-top: 1.5rem;
 }
 
-.actor-card {
+.idioma-card {
   background-color: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
   transition: var(--transition);
   border: 1px solid var(--border);
+  text-align: center;
 }
 
-.actor-card:hover {
+.idioma-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
 }
 
-.actor-card img {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  border-bottom: 1px solid var(--border);
+.idioma-card-icon {
+  padding: 1.5rem;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary);
+  font-size: 2rem;
 }
 
-.actor-card-content {
+.idioma-card-content {
   padding: 1rem;
+  border-top: 1px solid var(--border);
 }
 
-.actor-card h4 {
+.idioma-card h4 {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
   color: var(--text);
 }
 
-.actor-card p {
+.idioma-card p {
   margin: 0;
   font-size: 0.875rem;
   color: var(--text-light);
+  font-style: italic;
 }
 
-.actor-card .personaje {
-  color: var(--secondary);
-  font-weight: 500;
-}
-
-/* Mensaje cuando no hay actores */
+/* Mensaje cuando no hay idiomas */
 .empty-message {
   color: var(--text-light);
   font-style: italic;
@@ -238,6 +235,31 @@ select:focus, input[type="text"]:focus {
   gap: 1rem;
 }
 
+/* Form row */
+.form-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.form-col {
+  flex: 1;
+}
+
+/* Modal de éxito */
+.modal-content {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   body {
@@ -248,8 +270,8 @@ select:focus, input[type="text"]:focus {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
   
-  .actor-card img {
-    height: 200px;
+  .form-row {
+    flex-direction: column;
   }
 }
 

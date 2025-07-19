@@ -1,239 +1,45 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <title>Agregar Directores a la Película</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 30px;
-      background-color: #f4f4f4;
-    }
-
-    h1, h2 {
-      color: #333;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-
-    select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #218838;
-    }
-
-    #btnSiguiente {
-      background-color: #007bff;
-    }
-
-    #btnSiguiente:hover {
-      background-color: #0069d9;
-    }
-
-    .feedback {
-      margin-top: 15px;
-      font-weight: bold;
-    }
-
-    .success {
-      color: green;
-    }
-
-    .error {
-      color: red;
-    }
-
-    .card-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .director-card {
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      width: 200px;
-      padding: 15px;
-      text-align: center;
-    }
-
-    .director-card h4 {
-      margin: 5px 0;
-      font-size: 16px;
-      color: #333;
-    }
-
-    .director-card p {
-      margin: 0;
-      font-size: 14px;
-      color: #666;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agregar Directores | Sistema de Gestión Cinematográfica</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/agregar-directores.css">
 </head>
 <body>
+  <div class="container">
+    <h1><i class="fas fa-user-tie"></i> Agregar Directores</h1>
+    
+    <div class="info-pelicula">
+      <i class="fas fa-info-circle"></i>
+      <span id="peliculaIdInfo"></span>
+    </div>
 
-  <h1>Agregar Directores a la Película</h1>
-  <p id="peliculaIdInfo"></p>
+    <div class="form-group">
+      <label for="directorSelect">Selecciona un director:</label>
+      <select id="directorSelect" aria-label="Directores disponibles">
+        <option value="">-- Selecciona un director --</option>
+      </select>
 
-  <label for="directorSelect">Selecciona un director:</label>
-  <select id="directorSelect" aria-label="Directores disponibles">
-    <option value="">-- Selecciona un director --</option>
-  </select>
+      <button id="btnAgregarDirector" class="btn btn-success">
+        <i class="fas fa-plus"></i> Agregar a la película
+      </button>
 
-  <button id="btnAgregarDirector">Agregar a la película</button>
+      <div class="feedback" id="mensaje"></div>
+    </div>
 
-  <div class="feedback" id="mensaje"></div>
+    <h2><i class="fas fa-users"></i> Directores Seleccionados</h2>
+    <div id="listaDirectores" class="card-container">
+      <p class="empty-message">No hay directores asociados a esta película.</p>
+    </div>
 
-  <h2>Directores Asociados:</h2>
-  <div id="listaDirectores" class="card-container"></div>
-
-  <button id="btnSiguiente">Siguiente: Agregar Compañías</button>
-
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const peliculaId = urlParams.get("peliculaId");
-
-    const directorSelect = document.getElementById("directorSelect");
-    const listaDirectores = document.getElementById("listaDirectores");
-    const mensaje = document.getElementById("mensaje");
-    const directoresCargados = {};
-
-    document.getElementById("peliculaIdInfo").textContent = "Película ID: " + peliculaId;
-
-    async function cargarDirectores() {
-      try {
-        const response = await fetch("http://localhost:3000/api/directores");
-        const directores = await response.json();
-
-        directores.forEach(director => {
-          directoresCargados[director.id] = director;
-          const option = document.createElement("option");
-          option.value = director.id;
-          option.textContent = director.nombre;
-          directorSelect.appendChild(option);
-        });
-      } catch (err) {
-        mensaje.innerHTML = `<span class="error">⚠️ Error cargando directores: ${err.message}</span>`;
-      }
-    }
-
-    async function cargarDirectoresDePelicula() {
-      try {
-        const response = await fetch("http://localhost:3000/api/pelicula_director");
-        const datos = await response.json();
-
-        const relacionados = datos.filter(item => item.id_pelicula == peliculaId);
-        listaDirectores.innerHTML = relacionados.length === 0
-          ? "<p>No hay directores asociados a esta película.</p>"
-          : "";
-
-        relacionados.forEach(item => {
-          const card = document.createElement("div");
-          card.className = "director-card";
-
-          const img = document.createElement("img");
-          img.src = item.imagen_director || "https://via.placeholder.com/200x200?text=Sin+Imagen";
-          img.alt = item.nombre_director;
-          Object.assign(img.style, {
-            width: "100%",
-            height: "220px",
-            objectFit: "cover",
-            borderRadius: "5px",
-            marginBottom: "10px"
-          });
-
-          const h4 = document.createElement("h4");
-          h4.textContent = item.nombre_director;
-
-          card.appendChild(img);
-          card.appendChild(h4);
-          listaDirectores.appendChild(card);
-        });
-      } catch (err) {
-        mensaje.innerHTML = `<span class="error">⚠️ Error al cargar directores de la película: ${err.message}</span>`;
-      }
-    }
-
-    document.getElementById("btnAgregarDirector").addEventListener("click", async () => {
-      const directorId = directorSelect.value;
-
-      if (!peliculaId || !directorId) {
-        mensaje.innerHTML = `<span class="error">❌ Debes seleccionar un director válido.</span>`;
-        return;
-      }
-
-      // Evitar duplicado
-      const yaExiste = [...document.querySelectorAll(".director-card h4")].some(
-        el => el.textContent === directoresCargados[directorId].nombre
-      );
-      if (yaExiste) {
-        mensaje.innerHTML = `<span class="error">⚠️ Este director ya está asociado a la película.</span>`;
-        return;
-      }
-
-      const payload = {
-        id_pelicula: parseInt(peliculaId),
-        id_director: parseInt(directorId)
-      };
-
-      try {
-        const response = await fetch("http://localhost:3000/api/pelicula_director/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          mensaje.innerHTML = `<span class="error">❌ Error del servidor: ${result?.error?.detail || result.message || "Error inesperado"}</span>`;
-          return;
-        }
-
-        mensaje.innerHTML = `<span class="success">✅ Director agregado correctamente.</span>`;
-        await cargarDirectoresDePelicula();
-        directorSelect.value = "";
-      } catch (err) {
-        mensaje.innerHTML = `<span class="error">⚠️ Error al agregar director: ${err.message}</span>`;
-      }
-    });
-
-    document.getElementById("btnSiguiente").addEventListener("click", () => {
-      if (peliculaId) {
-        window.location.href = `agregar-companias.html?peliculaId=${peliculaId}`;
-      } else {
-        mensaje.innerHTML = `<span class="error">⚠️ No se encontró el ID de la película para continuar.</span>`;
-      }
-    });
-
-    if (peliculaId) {
-      cargarDirectores().then(() => cargarDirectoresDePelicula());
-    } else {
-      mensaje.innerHTML = `<span class="error">❌ No se proporcionó el ID de la película en la URL.</span>`;
-    }
-  </script>
+    <div class="actions">
+      <button id="btnSiguiente" class="btn btn-primary">
+        <i class="fas fa-arrow-right"></i> Siguiente: Agregar Compañías
+      </button>
+    </div>
+  </div>
+<script src="../js/agregar-directores.js"></script>
 </body>
 </html>
