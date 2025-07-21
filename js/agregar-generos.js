@@ -1,6 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
 const idPelicula = parseInt(urlParams.get("peliculaId"));
-document.getElementById("peliculaIdInfo").textContent = "Película ID: " + idPelicula;
+
 
 const selectGenero = document.getElementById("selectGenero");
 const listaGeneros = document.getElementById("listaGeneros");

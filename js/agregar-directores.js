@@ -1,12 +1,14 @@
     const urlParams = new URLSearchParams(window.location.search);
     const peliculaId = urlParams.get("peliculaId");
+    if (!peliculaId) {
+    alert("❌ No se proporcionó el ID de la película en la URL. Redirigiendo...");
+    window.location.href = "crud_peliculas.html"; // o a donde quieras volver
+    }
 
     const directorSelect = document.getElementById("directorSelect");
     const listaDirectores = document.getElementById("listaDirectores");
     const mensaje = document.getElementById("mensaje");
     const directoresCargados = {};
-
-    document.getElementById("peliculaIdInfo").textContent = "Película ID: " + peliculaId;
 
     async function cargarDirectores() {
       try {

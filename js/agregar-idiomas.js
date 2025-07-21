@@ -1,7 +1,5 @@
    const urlParams = new URLSearchParams(window.location.search);
     const idPelicula = parseInt(urlParams.get("peliculaId"));
-    document.getElementById("peliculaIdInfo").textContent = "Película ID: " + idPelicula;
-
     const selectIdioma = document.getElementById("selectIdioma");
     const listaIdiomas = document.getElementById("listaIdiomas");
     const mensaje = document.getElementById("mensaje");

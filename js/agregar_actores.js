@@ -2,6 +2,11 @@
 const urlParams = new URLSearchParams(window.location.search);
 const peliculaId = urlParams.get("peliculaId");
 
+if (!peliculaId) {
+  alert("ID de película no encontrado. Redirigiendo...");
+  window.location.href = "crud_peliculas.html"; // o a donde quieras llevarlo
+}
+
 const actorSelect = document.getElementById("actorSelect");
 const personajeInput = document.getElementById("personajeInput");
 const listaActores = document.getElementById("listaActores");
@@ -9,7 +14,6 @@ const mensaje = document.getElementById("mensaje");
 
 const actoresCargados = {};
 
-document.getElementById("peliculaIdInfo").textContent = "Película ID: " + peliculaId;
 
 async function cargarActores() {
   try {
