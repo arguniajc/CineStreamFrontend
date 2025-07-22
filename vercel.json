@@ -1,11 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/:file(.+).html",
-      "destination": "/",
-      "statusCode": 301
-    }
-  ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/actores", "destination": "/actores.html" },
