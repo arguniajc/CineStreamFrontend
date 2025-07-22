@@ -9,7 +9,7 @@ const generosCargados = {};
 
 async function cargarGeneros() {
   try {
-    const res = await fetch("http://localhost:3000/api/genero");
+    const res = await fetch("https://reelstormbackend.onrender.com/api/genero");
     const data = await res.json();
 
     data.forEach(genero => {
@@ -26,7 +26,7 @@ async function cargarGeneros() {
 
 async function mostrarGenerosAsignados() {
   try {
-    const res = await fetch("http://localhost:3000/api/pelicula-genero");
+    const res = await fetch("https://reelstormbackend.onrender.com/api/pelicula-genero");
     const data = await res.json();
     
     listaGeneros.innerHTML = "";
@@ -93,7 +93,7 @@ document.getElementById("btnAgregarGenero").addEventListener("click", async () =
   };
 
   try {
-    const res = await fetch("http://localhost:3000/api/pelicula-genero", {
+    const res = await fetch("https://reelstormbackend.onrender.com/api/pelicula-genero", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)

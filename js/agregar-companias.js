@@ -9,7 +9,7 @@
 
     async function cargarCompanias() {
       try {
-        const res = await fetch("http://localhost:3000/api/compania");
+        const res = await fetch("https://reelstormbackend.onrender.com/api/compania");
         const data = await res.json();
 
         data.forEach(compania => {
@@ -26,7 +26,7 @@
 
     async function mostrarCompaniasAsignadas() {
       try {
-        const res = await fetch("http://localhost:3000/api/pelicula-compania");
+        const res = await fetch("https://reelstormbackend.onrender.com/api/pelicula-compania");
         const data = await res.json();
         
         listaCompanias.innerHTML = "";
@@ -92,7 +92,7 @@
       };
 
       try {
-        const res = await fetch("http://localhost:3000/api/pelicula-compania", {
+        const res = await fetch("https://reelstormbackend.onrender.com/api/pelicula-compania", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)

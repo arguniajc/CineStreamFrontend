@@ -218,7 +218,7 @@ formPelicula.addEventListener("submit", async (e) => {
   console.log("📦 Enviando JSON:", JSON.stringify(pelicula, null, 2));
 
   try {
-    const respuesta = await fetch("http://localhost:3000/api/peliculas", {
+    const respuesta = await fetch("https://reelstormbackend.onrender.com/api/peliculas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(pelicula)

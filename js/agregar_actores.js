@@ -17,7 +17,7 @@ const actoresCargados = {};
 
 async function cargarActores() {
   try {
-    const response = await fetch("http://localhost:3000/api/actores");
+    const response = await fetch("https://reelstormbackend.onrender.com/api/actores");
     const actores = await response.json();
 
     actores.forEach(actor => {
@@ -34,7 +34,7 @@ async function cargarActores() {
 
 async function cargarActoresDePelicula(peliculaId) {
   try {
-    const response = await fetch("http://localhost:3000/api/pelicula-actor");
+    const response = await fetch("https://reelstormbackend.onrender.com/api/pelicula-actor");
     const datos = await response.json();
 
     const relacionesFiltradas = datos.filter(item => item.id_pelicula == peliculaId);
@@ -93,7 +93,7 @@ document.getElementById("btnAgregarActor").addEventListener("click", async () =>
   };
 
   try {
-    const response = await fetch("http://localhost:3000/api/pelicula-actor/", {
+    const response = await fetch("https://reelstormbackend.onrender.com/api/pelicula-actor/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)

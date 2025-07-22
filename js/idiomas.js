@@ -1,4 +1,4 @@
-const apiUrl = "http://localhost:3000/api/idioma";
+const apiUrl = "https://reelstormbackend.onrender.com/api/idioma";
 const contenedor = document.getElementById("listaIdiomas");
 const modal = document.getElementById("modal");
 const inputId = document.getElementById("item-id");

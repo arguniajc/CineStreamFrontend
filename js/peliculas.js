@@ -1,4 +1,4 @@
-const apiUrl = "http://localhost:3000/api/peliculas";
+const apiUrl = "https://reelstormbackend.onrender.com/api/peliculas";
 const contenedor = document.getElementById("contenedor");
 const modal = document.getElementById("modal");
 const modalTitulo = document.getElementById("modal-titulo");

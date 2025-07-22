@@ -7,7 +7,7 @@
 
     async function cargarIdiomas() {
       try {
-        const res = await fetch("http://localhost:3000/api/idioma");
+        const res = await fetch("https://reelstormbackend.onrender.com/api/idioma");
         const data = await res.json();
 
         data.forEach(idioma => {
@@ -24,7 +24,7 @@
 
     async function mostrarIdiomasAsignados() {
       try {
-        const res = await fetch("http://localhost:3000/api/pelicula-idioma");
+        const res = await fetch("https://reelstormbackend.onrender.com/api/pelicula-idioma");
         const data = await res.json();
         
         listaIdiomas.innerHTML = "";
@@ -91,7 +91,7 @@
       };
 
       try {
-        const res = await fetch("http://localhost:3000/api/pelicula-idioma", {
+        const res = await fetch("https://reelstormbackend.onrender.com/api/pelicula-idioma", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)

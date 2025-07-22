@@ -3,7 +3,7 @@ const modalPelicula = new bootstrap.Modal(document.getElementById('modalPelicula
 
 async function cargarPeliculas() {
   try {
-    const res = await fetch("http://localhost:3000/api/peliculas");
+    const res = await fetch("https://reelstormbackend.onrender.com/api/peliculas");
    const peliculas = (await res.json()).sort((a, b) => b.ano_estreno - a.ano_estreno);
 
 
@@ -46,7 +46,7 @@ async function abrirModalPelicula(idPelicula) {
   });
 
   try {
-    const res = await fetch("http://localhost:3000/api/peliculas");
+    const res = await fetch("https://reelstormbackend.onrender.com/api/peliculas");
     const peliculas = await res.json();
     const pelicula = peliculas.find(p => p.id === idPelicula);
     if (!pelicula) return alert("Película no encontrada");
@@ -85,10 +85,10 @@ async function abrirModalPelicula(idPelicula) {
     // Cargar relaciones
     await Promise.all([
       cargarActores(idPelicula),
-      cargarConImagen("http://localhost:3000/api/pelicula_director/", "listaDirectores", "nombre_director", "imagen_director", idPelicula),
-      cargarConImagen("http://localhost:3000/api/pelicula-compania", "listaCompanias", "nombre_compania", "logo_compania", idPelicula),
-      cargarSinImagen("http://localhost:3000/api/pelicula-idioma", "listaIdiomas", "nombre_idioma", idPelicula),
-      cargarSinImagen("http://localhost:3000/api/pelicula-genero", "listaGeneros", "nombre_genero", idPelicula)
+      cargarConImagen("https://reelstormbackend.onrender.com/api/pelicula_director/", "listaDirectores", "nombre_director", "imagen_director", idPelicula),
+      cargarConImagen("https://reelstormbackend.onrender.com/api/pelicula-compania", "listaCompanias", "nombre_compania", "logo_compania", idPelicula),
+      cargarSinImagen("https://reelstormbackend.onrender.com/api/pelicula-idioma", "listaIdiomas", "nombre_idioma", idPelicula),
+      cargarSinImagen("https://reelstormbackend.onrender.com/api/pelicula-genero", "listaGeneros", "nombre_genero", idPelicula)
     ]);
 
     modalPelicula.show();
@@ -99,7 +99,7 @@ async function abrirModalPelicula(idPelicula) {
 }
 
 async function cargarActores(idPelicula) {
-  const res = await fetch("http://localhost:3000/api/pelicula-actor/");
+  const res = await fetch("https://reelstormbackend.onrender.com/api/pelicula-actor/");
   const data = await res.json();
   const filtrados = data.filter(item => item.id_pelicula === idPelicula);
   const ul = document.getElementById("listaActores");

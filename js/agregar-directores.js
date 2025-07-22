@@ -12,7 +12,7 @@
 
     async function cargarDirectores() {
       try {
-        const response = await fetch("http://localhost:3000/api/directores");
+        const response = await fetch("https://reelstormbackend.onrender.com/api/directores");
         const directores = await response.json();
 
         directores.forEach(director => {
@@ -29,7 +29,7 @@
 
     async function cargarDirectoresDePelicula() {
       try {
-        const response = await fetch("http://localhost:3000/api/pelicula_director");
+        const response = await fetch("https://reelstormbackend.onrender.com/api/pelicula_director");
         const datos = await response.json();
 
         const relacionados = datos.filter(item => item.id_pelicula == peliculaId);
@@ -94,7 +94,7 @@
       };
 
       try {
-        const response = await fetch("http://localhost:3000/api/pelicula_director/", {
+        const response = await fetch("https://reelstormbackend.onrender.com/api/pelicula_director/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)

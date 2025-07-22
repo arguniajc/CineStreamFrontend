@@ -1,4 +1,4 @@
-const apiUrl = "http://localhost:3000/api/directores";
+const apiUrl = "https://reelstormbackend.onrender.com/api/directores";
 const contenedor = document.getElementById("contenedor");
 const modal = document.getElementById("modal");
 const inputId = document.getElementById("item-id");
