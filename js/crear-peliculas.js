@@ -12,48 +12,40 @@ const DOM = {
   contenedorVideo: document.getElementById('videoPreviewContainer'),
   vistaVideo: document.getElementById('videoPreview'),
   
-  // Toggle de tema
-  btnTema: document.getElementById('themeToggle'),
-  htmlRoot: document.documentElement,
-  
   // Selectores de formulario
   selectPais: document.getElementById("pais"),
   selectAnio: document.getElementById("ano_estreno"),
   calificacionInput: document.getElementById("calificacion"),
-  formPelicula: document.getElementById("formPelicula")
+  formPelicula: document.getElementById("formPelicula"),
+  
+  // Elementos de UI
+  btnSubmit: document.querySelector('#formPelicula button[type="submit"]')
 };
 
 // =======================
-// VISTA PREVIA DE IMAGEN
+// UTILIDADES
 // =======================
-const setupImagePreview = () => {
-  DOM.imagenPortada.addEventListener('input', () => {
-    const url = DOM.imagenPortada.value.trim();
-    
-    if (!url) {
-      DOM.contenedorPreview.style.display = 'none';
-      return;
-    }
-
-    DOM.vistaPrevia.src = url;
-    
-    DOM.vistaPrevia.onload = () => {
-      DOM.contenedorPreview.style.display = 'block';
-      DOM.vistaPrevia.style.display = 'block';
+const Utils = {
+  // Debounce para eventos de input
+  debounce: (func, wait) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
     };
+  },
 
-    DOM.vistaPrevia.onerror = () => {
-      DOM.contenedorPreview.style.display = 'none';
-    };
-  });
-};
+  // Formatear fecha a YYYY-MM-DD
+  formatDate: (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  },
 
-// =======================
-// VISTA PREVIA DE VIDEO
-// =======================
-const setupVideoPreview = () => {
-  const convertirYouTubeEmbed = (url) => {
-    // Soporte para múltiples formatos de URL de YouTube
+  // Extraer ID de YouTube
+  extractYouTubeId: (url) => {
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/,
       /(?:youtube\.com\/embed\/)([\w-]{11})/,
@@ -62,326 +54,448 @@ const setupVideoPreview = () => {
     
     for (const pattern of patterns) {
       const match = url.match(pattern);
-      if (match) return `https://www.youtube.com/embed/${match[1]}?rel=0&showinfo=0`;
+      if (match) return match[1];
     }
     return null;
-  };
-
-  DOM.inputTrailer.addEventListener('input', debounce(() => {
-    const url = DOM.inputTrailer.value.trim();
-    const embed = convertirYouTubeEmbed(url);
-
-    if (embed) {
-      DOM.vistaVideo.src = embed;
-      DOM.contenedorVideo.style.display = 'block';
-    } else {
-      DOM.vistaVideo.src = '';
-      DOM.contenedorVideo.style.display = 'none';
-    }
-  }, 500));
+  }
 };
 
 // =======================
-// TOGGLE DE TEMA
+// MANEJO DE NOTIFICACIONES
 // =======================
-const setupThemeToggle = () => {
-  const themeVariables = {
-    light: {
-      '--text': '#333333',
-      '--text-light': '#6b7280',
-      '--bg': '#f9fafb',
-      '--card-bg': '#ffffff',
-      '--border': '#e5e7eb',
-      '--preview-bg': '#f3f4f6',
-    },
-    dark: {
-      '--text': '#e5e7eb',
-      '--text-light': '#9ca3af',
-      '--bg': '#111827',
-      '--card-bg': '#1f2937',
-      '--border': '#374151',
-      '--preview-bg': '#111827',
-    }
-  };
+const Notificaciones = {
+  mostrar: (mensaje, tipo = 'info') => {
+    const colors = {
+      success: '#10b981',
+      error: '#e53935',
+      info: '#3b82f6',
+      warning: '#f59e0b'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.style.backgroundColor = colors[tipo] || colors.info;
+    notification.innerHTML = `
+      <i class="fas ${tipo === 'success' ? 'fa-check-circle' : tipo === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+      <span>${mensaje}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Mostrar notificación
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    
+    // Ocultar después de 3 segundos
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  },
 
-  DOM.btnTema.addEventListener('click', () => {
-    const isDarkMode = DOM.htmlRoot.getAttribute('data-theme') === 'dark';
-    const newTheme = isDarkMode ? 'light' : 'dark';
-    
-    // Actualizar atributo y icono
-    DOM.htmlRoot.setAttribute('data-theme', newTheme);
-    DOM.btnTema.innerHTML = isDarkMode 
-      ? '<i class="fas fa-sun"></i>' 
-      : '<i class="fas fa-moon"></i>';
-    
-    // Aplicar variables CSS
-    for (const [variable, value] of Object.entries(themeVariables[newTheme])) {
-      DOM.htmlRoot.style.setProperty(variable, value);
+  init: () => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        color: white;
+        border-radius: 4px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+      }
+      
+      .notification.show {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      
+      .notification i {
+        font-size: 1.2em;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+};
+
+// =======================
+// VISTA PREVIA DE IMAGEN
+// =======================
+const ImagePreview = {
+  init: () => {
+    DOM.imagenPortada.addEventListener('input', Utils.debounce(() => {
+      const url = DOM.imagenPortada.value.trim();
+      
+      if (!url) {
+        DOM.contenedorPreview.style.display = 'none';
+        return;
+      }
+
+      // Crear imagen temporal para verificar si es válida
+      const tempImg = new Image();
+      tempImg.src = url;
+      
+      tempImg.onload = () => {
+        DOM.vistaPrevia.src = url;
+        DOM.contenedorPreview.style.display = 'block';
+        DOM.vistaPrevia.style.display = 'block';
+      };
+
+      tempImg.onerror = () => {
+        DOM.contenedorPreview.style.display = 'none';
+        Notificaciones.mostrar('La URL de la imagen no es válida', 'warning');
+      };
+    }, 500));
+  }
+};
+
+// =======================
+// VISTA PREVIA DE VIDEO
+// =======================
+const VideoPreview = {
+  init: () => {
+    DOM.inputTrailer.addEventListener('input', Utils.debounce(() => {
+      const url = DOM.inputTrailer.value.trim();
+      const videoId = Utils.extractYouTubeId(url);
+      
+      if (videoId) {
+        DOM.vistaVideo.src = `https://www.youtube.com/embed/${videoId}?rel=0&showinfo=0`;
+        DOM.contenedorVideo.style.display = 'block';
+      } else {
+        DOM.vistaVideo.src = '';
+        DOM.contenedorVideo.style.display = 'none';
+        if (url) {
+          Notificaciones.mostrar('URL de YouTube no válida', 'warning');
+        }
+      }
+    }, 500));
+  }
+};
+
+// =======================
+// MANEJO DE PAÍSES
+// =======================
+const Paises = {
+  cargar: async () => {
+    try {
+      // Mostrar estado de carga
+      DOM.selectPais.innerHTML = '<option value="">Cargando países...</option>';
+      DOM.selectPais.disabled = true;
+      
+      // Intentar cargar desde la API
+      const response = await fetch("https://restcountries.com/v3.1/all?fields=translations,cca2,name,flags");
+      
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      
+      const data = await response.json();
+
+      if (!data || !Array.isArray(data)) {
+        throw new Error("Datos de países no recibidos correctamente");
+      }
+
+      const paisesOrdenados = data
+        .map(p => ({
+          nombre: p.translations?.spa?.common || p.name.common,
+          codigo: p.cca2,
+          bandera: p.flags?.png
+        }))
+        .filter(p => p.nombre && p.codigo)
+        .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+      // Limpiar select
+      DOM.selectPais.innerHTML = '<option value="">Seleccione un país</option>';
+      
+      // Agregar opciones
+      paisesOrdenados.forEach(pais => {
+        const option = document.createElement("option");
+        option.value = pais.codigo;
+        option.textContent = pais.nombre;
+        option.dataset.bandera = pais.bandera;
+        DOM.selectPais.appendChild(option);
+      });
+      
+      DOM.selectPais.disabled = false;
+      
+    } catch (error) {
+      console.error("Error cargando países:", error);
+      Notificaciones.mostrar("No se pudieron cargar los países. Usando lista local.", "error");
+      Paises.cargarRespaldo();
     }
-    
-    // Guardar preferencia en localStorage
-    localStorage.setItem('themePreference', newTheme);
-  });
+  },
   
-  // Cargar tema guardado
-  const savedTheme = localStorage.getItem('themePreference') || 'dark';
-  DOM.htmlRoot.setAttribute('data-theme', savedTheme);
-  DOM.btnTema.innerHTML = savedTheme === 'dark' 
-    ? '<i class="fas fa-moon"></i>' 
-    : '<i class="fas fa-sun"></i>';
-};
-
-// =======================
-// CARGAR PAÍSES DESDE API
-// =======================
-const cargarPaises = async () => {
-  try {
-    const response = await fetch("https://restcountries.com/v3.1/all?fields=translations,cca2,name,flags");
-    const data = await response.json();
-
-    const paisesOrdenados = data
-      .map(p => ({
-        nombre: p.translations?.spa?.common || p.name.common,
-        codigo: p.cca2,
-        bandera: p.flags?.png
-      }))
-      .sort((a, b) => a.nombre.localeCompare(b.nombre));
-
-    // Limpiar select primero
-    DOM.selectPais.innerHTML = '<option value="">Seleccione un país</option>';
+  cargarRespaldo: () => {
+    const paisesRespaldo = [
+      {codigo: "US", nombre: "Estados Unidos"},
+      {codigo: "MX", nombre: "México"},
+      {codigo: "ES", nombre: "España"},
+      {codigo: "AR", nombre: "Argentina"},
+      {codigo: "CO", nombre: "Colombia"},
+      {codigo: "FR", nombre: "Francia"},
+      {codigo: "IT", nombre: "Italia"},
+      {codigo: "JP", nombre: "Japón"},
+      {codigo: "GB", nombre: "Reino Unido"},
+      {codigo: "DE", nombre: "Alemania"}
+    ];
     
-    paisesOrdenados.forEach(pais => {
+    DOM.selectPais.innerHTML = '<option value="">Seleccione un país</option>';
+    paisesRespaldo.forEach(pais => {
       const option = document.createElement("option");
-      option.value = pais.nombre;
+      option.value = pais.codigo;
       option.textContent = pais.nombre;
-      option.dataset.bandera = pais.bandera;
       DOM.selectPais.appendChild(option);
     });
-
-  } catch (error) {
-    console.error("Error cargando países:", error);
-    mostrarNotificacion("No se pudieron cargar los países. Intente recargar la página.", "error");
+    DOM.selectPais.disabled = false;
   }
 };
 
 // =======================
-// FORMULARIO - AÑOS DE ESTRENO
+// MANEJO DE AÑOS
 // =======================
-const setupAniosEstreno = () => {
-  const currentYear = new Date().getFullYear();
-  for (let anio = currentYear + 5; anio >= 1900; anio--) {
-    const option = document.createElement("option");
-    option.value = anio;
-    option.textContent = anio;
-    DOM.selectAnio.appendChild(option);
-  }
-};
-
-// =======================
-// VALIDACIÓN DE CALIFICACIÓN
-// =======================
-const setupCalificacionValidation = () => {
-  DOM.calificacionInput.addEventListener("input", () => {
-    let valor = parseFloat(DOM.calificacionInput.value);
+const AniosEstreno = {
+  init: () => {
+    const currentYear = new Date().getFullYear();
+    const startYear = 1900;
     
-    if (isNaN(valor)) {
-      DOM.calificacionInput.value = '';
-      return;
+    // Limpiar select
+    DOM.selectAnio.innerHTML = '<option value="">Seleccione un año</option>';
+    
+    // Agregar opciones
+    for (let anio = currentYear + 5; anio >= startYear; anio--) {
+      const option = document.createElement("option");
+      option.value = anio;
+      option.textContent = anio;
+      DOM.selectAnio.appendChild(option);
     }
     
-    // Asegurar que esté entre 1 y 10
-    valor = Math.min(Math.max(valor, 1), 10);
-    DOM.calificacionInput.value = valor.toFixed(1);
-  });
+    // Establecer año actual como predeterminado
+    DOM.selectAnio.value = currentYear;
+  }
+};
+
+// =======================
+// VALIDACIÓN DE FORMULARIO
+// =======================
+const Validacion = {
+  // Validar campo individual
+  validarCampo: (campo) => {
+    const valor = campo.value.trim();
+    const grupo = campo.closest('.form-group');
+    const mensajeError = grupo?.querySelector('.error-message');
+    
+    if (!grupo || !mensajeError) return true;
+    
+    // Limpiar estado anterior
+    grupo.classList.remove('valido', 'invalido');
+    mensajeError.style.display = 'none';
+    
+    // Validar según el tipo de campo
+    let valido = true;
+    let mensaje = '';
+    
+    if (campo.required && !valor) {
+      valido = false;
+      mensaje = 'Este campo es obligatorio';
+    } else if (campo.type === 'number') {
+      const min = parseFloat(campo.min);
+      const max = parseFloat(campo.max);
+      const numValor = parseFloat(valor);
+      
+      if (isNaN(numValor)) {
+        valido = false;
+        mensaje = 'Debe ser un número válido';
+      } else if (!isNaN(min) && numValor < min) {
+        valido = false;
+        mensaje = `El valor mínimo es ${min}`;
+      } else if (!isNaN(max) && numValor > max) {
+        valido = false;
+        mensaje = `El valor máximo es ${max}`;
+      }
+    } else if (campo.type === 'url' && valor) {
+      try {
+        new URL(valor);
+      } catch {
+        valido = false;
+        mensaje = 'URL no válida';
+      }
+    } else if (campo.id === 'fecha_estreno' && valor) {
+      const fecha = new Date(valor);
+      const hoy = new Date();
+      
+      if (fecha > hoy) {
+        valido = false;
+        mensaje = 'La fecha no puede ser futura';
+      }
+    }
+    
+    // Aplicar estilos y mensajes
+    if (!valido) {
+      grupo.classList.add('invalido');
+      mensajeError.textContent = mensaje;
+      mensajeError.style.display = 'block';
+    } else {
+      grupo.classList.add('valido');
+    }
+    
+    return valido;
+  },
+  
+  // Validar todo el formulario
+  validarFormulario: () => {
+    let valido = true;
+    const campos = DOM.formPelicula.querySelectorAll('input, select, textarea[required]');
+    
+    campos.forEach(campo => {
+      if (!Validacion.validarCampo(campo)) {
+        valido = false;
+      }
+    });
+    
+    return valido;
+  },
+  
+  // Inicializar validaciones
+  init: () => {
+    // Validar al cambiar campos
+    DOM.formPelicula.querySelectorAll('input, select, textarea').forEach(campo => {
+      campo.addEventListener('blur', () => Validacion.validarCampo(campo));
+    });
+    
+    // Validación especial para calificación
+    DOM.calificacionInput.addEventListener('input', () => {
+      let valor = parseFloat(DOM.calificacionInput.value);
+      
+      if (isNaN(valor)) {
+        DOM.calificacionInput.value = '';
+        return;
+      }
+      
+      // Asegurar que esté entre 1 y 10 con un decimal
+      valor = Math.min(Math.max(valor, 1), 10);
+      DOM.calificacionInput.value = valor.toFixed(1);
+    });
+  }
 };
 
 // =======================
 // MANEJO DEL FORMULARIO
 // =======================
-const setupFormulario = () => {
-  DOM.formPelicula.addEventListener("submit", async (e) => {
+const Formulario = {
+  // Obtener datos del formulario
+  obtenerDatos: () => {
+    const getValue = (id) => {
+      const element = document.getElementById(id);
+      return element ? element.value.trim() : '';
+    };
+    
+    return {
+      tituloEspanol: getValue("titulo_espanol"),
+      tituloOriginal: getValue("titulo_original"),
+      anio: parseInt(getValue("ano_estreno")),
+      duracion: parseInt(getValue("duracion_minutos")),
+      calificacion: parseFloat(getValue("calificacion")),
+      fechaEstreno: getValue("fecha_estreno"),
+      sinopsis: getValue("sinopsis"),
+      trailerUrl: getValue("trailer_url"),
+      pais: getValue("pais"),
+      imagenPortada: getValue("imagen_portada")
+    };
+  },
+  
+  // Enviar datos al servidor
+  enviarDatos: async (datos) => {
+    const response = await fetch("https://reelstormbackend.onrender.com/api/peliculas", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(datos)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al guardar la película");
+    }
+    
+    return await response.json();
+  },
+  
+  // Manejar envío del formulario
+  manejarSubmit: async (e) => {
     e.preventDefault();
     
+    if (!Validacion.validarFormulario()) {
+      Notificaciones.mostrar("Por favor, complete todos los campos correctamente", "error");
+      return;
+    }
+    
     // Mostrar loader
-    const submitBtn = DOM.formPelicula.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
-    submitBtn.disabled = true;
+    const originalBtnText = DOM.btnSubmit.innerHTML;
+    DOM.btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+    DOM.btnSubmit.disabled = true;
     
     try {
-      const formData = obtenerDatosFormulario();
-      validarDatosFormulario(formData);
+      const formData = Formulario.obtenerDatos();
+      const respuesta = await Formulario.enviarDatos(formData);
       
-      const pelicula = {
-        titulo_espanol: formData.tituloEspanol,
-        titulo_original: formData.tituloOriginal,
-        ano_estreno: formData.anio,
-        duracion: formData.duracion,
-        calificacion: formData.calificacion,
-        fecha_estreno: formData.fechaEstreno,
-        sinopsis: formData.sinopsis,
-        pais: formData.pais,
-        trailer_url: formData.trailerUrl,
-        imagen_portada: formData.imagenPortada
-      };
-
-      console.log("📦 Datos de la película:", pelicula);
+      Notificaciones.mostrar("Película creada exitosamente!", "success");
       
-      const respuesta = await enviarDatosPelicula(pelicula);
-      manejarRespuesta(respuesta);
+      // Redirigir después de 1.5 segundos
+      setTimeout(() => {
+        const idPelicula = respuesta.id || respuesta._id || respuesta.peliculaId;
+        if (idPelicula) {
+          window.location.href = `agregar_actores.html?peliculaId=${encodeURIComponent(idPelicula)}`;
+        } else {
+          Notificaciones.mostrar("No se recibió ID de película", "error");
+        }
+      }, 1500);
       
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
-      mostrarNotificacion(error.message, "error");
+      Notificaciones.mostrar(error.message || "Error al guardar la película", "error");
     } finally {
-      submitBtn.innerHTML = originalBtnText;
-      submitBtn.disabled = false;
+      DOM.btnSubmit.innerHTML = originalBtnText;
+      DOM.btnSubmit.disabled = false;
     }
-  });
-};
-
-// Helper: Obtener datos del formulario
-const obtenerDatosFormulario = () => {
-  const getValue = (id) => document.getElementById(id).value.trim();
+  },
   
-  return {
-    tituloEspanol: getValue("titulo_espanol"),
-    tituloOriginal: getValue("titulo_original"),
-    anio: parseInt(getValue("ano_estreno")),
-    duracion: parseInt(getValue("duracion_minutos")),
-    calificacion: parseFloat(getValue("calificacion")),
-    fechaEstreno: getValue("fecha_estreno"),
-    sinopsis: getValue("sinopsis"),
-    trailerUrl: getValue("trailer_url"),
-    pais: getValue("pais"),
-    imagenPortada: getValue("imagen_portada")
-  };
-};
-
-// Helper: Validar datos del formulario
-const validarDatosFormulario = (data) => {
-  const errors = [];
-  
-  if (!data.tituloEspanol) errors.push("El título en español es obligatorio");
-  if (!data.tituloOriginal) errors.push("El título original es obligatorio");
-  if (!data.anio || data.anio < 1900 || data.anio > new Date().getFullYear() + 5) {
-    errors.push(`El año debe estar entre 1900 y ${new Date().getFullYear() + 5}`);
+  // Inicializar formulario
+  init: () => {
+    DOM.formPelicula.addEventListener("submit", Formulario.manejarSubmit);
   }
-  if (!data.duracion || data.duracion <= 0 || data.duracion > 1000) {
-    errors.push("La duración debe estar entre 1 y 1000 minutos");
-  }
-  if (!data.calificacion || data.calificacion < 1 || data.calificacion > 10) {
-    errors.push("La calificación debe estar entre 1.0 y 10.0");
-  }
-  if (!data.fechaEstreno) errors.push("La fecha de estreno es obligatoria");
-  if (!data.sinopsis || data.sinopsis.length < 20) {
-    errors.push("La sinopsis debe tener al menos 20 caracteres");
-  }
-  if (!data.trailerUrl) errors.push("El trailer es obligatorio");
-  if (!data.pais) errors.push("El país es obligatorio");
-  if (!data.imagenPortada) errors.push("La imagen de portada es obligatoria");
-  
-  if (errors.length > 0) {
-    throw new Error(errors.join("\n"));
-  }
-};
-
-// Helper: Enviar datos al servidor
-const enviarDatosPelicula = async (pelicula) => {
-  const response = await fetch("https://reelstormbackend.onrender.com/api/peliculas", {
-    method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    },
-    body: JSON.stringify(pelicula)
-  });
-  
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Error al guardar la película");
-  }
-  
-  return await response.json();
-};
-
-// Helper: Manejar respuesta del servidor
-const manejarRespuesta = (respuesta) => {
-  const idPelicula = respuesta.id || respuesta._id || respuesta.peliculaId;
-  if (!idPelicula) throw new Error("No se recibió un ID válido para la película");
-  
-  mostrarNotificacion("Película creada exitosamente!", "success");
-  
-  // Redirigir después de 1.5 segundos
-  setTimeout(() => {
-    window.location.href = `agregar_actores.html?peliculaId=${encodeURIComponent(idPelicula)}`;
-  }, 1500);
-};
-
-// =======================
-// UTILIDADES
-// =======================
-// Debounce para eventos de input
-const debounce = (func, wait) => {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-};
-
-// Mostrar notificaciones al usuario
-const mostrarNotificacion = (mensaje, tipo = 'info') => {
-  const colors = {
-    success: '#10b981',
-    error: '#e53935',
-    info: '#3b82f6'
-  };
-  
-  const notification = document.createElement('div');
-  notification.style.position = 'fixed';
-  notification.style.top = '20px';
-  notification.style.right = '20px';
-  notification.style.padding = '12px 24px';
-  notification.style.background = colors[tipo] || colors.info;
-  notification.style.color = 'white';
-  notification.style.borderRadius = '4px';
-  notification.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-  notification.style.zIndex = '1000';
-  notification.style.animation = 'fadeIn 0.3s ease-out';
-  notification.textContent = mensaje;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.style.animation = 'fadeOut 0.3s ease-out';
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
 };
 
 // =======================
 // INICIALIZACIÓN
 // =======================
-document.addEventListener("DOMContentLoaded", () => {
-  setupImagePreview();
-  setupVideoPreview();
-  setupThemeToggle();
-  setupAniosEstreno();
-  setupCalificacionValidation();
-  setupFormulario();
-  cargarPaises();
+document.addEventListener("DOMContentLoaded", async () => {
+  // Inicializar notificaciones
+  Notificaciones.init();
   
-  // Agregar estilos para animaciones de notificación
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; transform: translateY(0); }
-      to { opacity: 0; transform: translateY(-20px); }
-    }
-  `;
-  document.head.appendChild(style);
+  // Inicializar componentes
+  ImagePreview.init();
+  VideoPreview.init();
+  Validacion.init();
+  Formulario.init();
+  AniosEstreno.init();
+  
+  // Cargar países (puede ser asíncrono)
+  await Paises.cargar();
+  
+  // Establecer fecha actual como predeterminada
+  const fechaInput = document.getElementById('fecha_estreno');
+  if (fechaInput) {
+    fechaInput.value = Utils.formatDate(new Date());
+  }
 });
