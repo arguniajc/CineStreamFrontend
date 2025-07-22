@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Catálogo completo de películas con filtros avanzados y detalles">
+  <title>Catálogo de Películas | ReelStorm</title>
+  
+  <!-- Preconexión para mejorar performance -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://api.reelstormbackend.com">
+  
+  <!-- Bootstrap CSS optimizado -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" 
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  
+  <!-- Íconos -->
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS personalizado con preload -->
+  <link rel="preload" href="../css/catalogo.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="../css/catalogo.css"></noscript>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+  <link rel="alternate icon" href="../img/favicon.ico">
+  
+  <!-- Metatags para redes sociales -->
+  <meta property="og:title" content="Catálogo de Películas | ReelStorm">
+  <meta property="og:description" content="Explora nuestro catálogo completo de películas con filtros avanzados">
+  <meta property="og:image" content="https://reelstorm.com/img/og-image.jpg">
+  <meta property="og:url" content="https://reelstorm.com/catalogo">
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body>
+  <!-- Header con navegación -->
+  <header class="header sticky-top">
+    <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand logo" href="../index.html">
+            <i class="fas fa-film me-2"></i>ReelStorm
+          </a>
+          
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          
+          <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="../index.html"><i class="fas fa-home me-1"></i> Inicio</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="catalogo.html">
+                  <i class="fas fa-list me-1"></i> Catálogo
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="proximos.html"><i class="fas fa-calendar-alt me-1"></i> Próximos</a>
+              </li>
+            </ul>
+            
+            <div class="d-flex align-items-center">
+              <div class="search-container me-3">
+                <div class="input-group">
+                  <input type="text" id="searchInput" class="form-control" placeholder="Buscar..." 
+                         aria-label="Buscar películas" aria-describedby="searchBtn">
+                  <button id="searchBtn" class="btn btn-primary" type="button">
+                    <i class="mdi mdi-magnify"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <button id="themeToggle" class="btn btn-outline-light me-2" aria-label="Cambiar tema">
+                <i class="fas fa-moon"></i>
+              </button>
+              
+              <a href="login.html" class="btn btn-outline-light">
+                <i class="fas fa-user me-1"></i> <span class="d-none d-md-inline">Iniciar sesión</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="container my-4">
+    <!-- Filtros avanzados -->
+    <section aria-labelledby="filtersHeading">
+      <div class="filters-section bg-dark p-4 rounded-3 mb-4">
+        <h2 id="filtersHeading" class="visually-hidden">Filtros de búsqueda</h2>
+        
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="genreFilter" class="form-label">Género</label>
+            <select id="genreFilter" class="form-select">
+              <option value="">Todos los géneros</option>
+              <!-- Géneros se cargarán dinámicamente -->
+            </select>
+          </div>
+          
+          <div class="col-md-2">
+            <label for="yearFilter" class="form-label">Año</label>
+            <select id="yearFilter" class="form-select">
+              <option value="">Todos los años</option>
+              <!-- Años se cargarán dinámicamente -->
+            </select>
+          </div>
+          
+          <div class="col-md-2">
+            <label for="ratingFilter" class="form-label">Calificación</label>
+            <select id="ratingFilter" class="form-select">
+              <option value="">Todas</option>
+              <option value="9">9+ Estrellas</option>
+              <option value="8">8+ Estrellas</option>
+              <option value="7">7+ Estrellas</option>
+            </select>
+          </div>
+          
+          <div class="col-md-3">
+            <label for="sortBy" class="form-label">Ordenar por</label>
+            <select id="sortBy" class="form-select">
+              <option value="recientes">Más recientes</option>
+              <option value="antiguos">Más antiguos</option>
+              <option value="mejor">Mejor valoradas</option>
+              <option value="peor">Peor valoradas</option>
+            </select>
+          </div>
+          
+          <div class="col-md-2 d-flex align-items-end">
+            <button id="resetFilters" class="btn btn-outline-secondary w-100">
+              <i class="fas fa-undo me-1"></i> Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Listado de películas -->
+    <section aria-labelledby="moviesHeading">
+      <h2 id="moviesHeading" class="visually-hidden">Listado de películas</h2>
+      
+      <div class="movies-container position-relative">
+        <div id="listaPeliculas" class="row g-4">
+          <!-- Películas se cargarán dinámicamente aquí -->
+        </div>
+        
+        <!-- Estados de carga -->
+        <div id="loadingIndicator" class="loading-indicator text-center py-5 d-none">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="mt-3">Cargando películas...</p>
+        </div>
+        
+        <div id="noResults" class="text-center py-5 d-none">
+          <i class="fas fa-film fa-3x mb-3 text-muted"></i>
+          <h3>No se encontraron películas</h3>
+          <p class="text-muted">Intenta con otros filtros de búsqueda</p>
+          <button id="resetFiltersEmpty" class="btn btn-primary mt-3">
+            <i class="fas fa-undo me-1"></i> Reiniciar filtros
+          </button>
+        </div>
+        
+        <!-- Paginación -->
+        <nav id="pagination" class="mt-4 d-flex justify-content-center" aria-label="Paginación">
+          <ul class="pagination">
+            <!-- Paginación se generará dinámicamente -->
+          </ul>
+        </nav>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de Detalles -->
+  <div class="modal fade" id="modalPelicula" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content bg-dark text-white">
+        <div class="modal-header border-secondary">
+          <h3 class="modal-title" id="modalTitle"></h3>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="row">
+            <!-- Columna izquierda - Poster y detalles básicos -->
+            <div class="col-lg-4 mb-4 mb-lg-0">
+              <img id="posterModal" src="" class="img-fluid rounded-3 shadow mb-3" alt="Poster de la película" loading="lazy">
+              
+              <div class="card bg-dark border-secondary mb-3">
+                <div class="card-body">
+                  <div class="rating-stars mb-2 fs-4 text-warning" aria-hidden="true"></div>
+                  <p class="mb-2"><strong><i class="fas fa-star text-warning me-2"></i>Calificación:</strong> <span id="calificacionPelicula"></span></p>
+                  <p class="mb-2"><strong><i class="fas fa-clock me-2"></i>Duración:</strong> <span id="duracionPelicula"></span> min</p>
+                  <p class="mb-2"><strong><i class="fas fa-calendar-alt me-2"></i>Fecha estreno:</strong> <span id="fechaEstrenoPelicula"></span></p>
+                  <p class="mb-0"><strong><i class="fas fa-globe me-2"></i>País:</strong> <span id="paisPelicula"></span></p>
+                </div>
+              </div>
+              
+              <!-- Trailer -->
+              <div class="ratio ratio-16x9 mb-3">
+                <iframe id="trailerPelicula" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" title="Tráiler de la película"></iframe>
+              </div>
+            </div>
+            
+            <!-- Columna derecha - Detalles completos -->
+            <div class="col-lg-8">
+              <h5 class="text-muted mb-3" id="tituloOriginal"></h5>
+              
+              <section aria-labelledby="sinopsisHeading">
+                <h4 id="sinopsisHeading" class="border-bottom border-secondary pb-2 mb-3">Sinopsis</h4>
+                <p id="sinopsisPelicula" class="lead"></p>
+              </section>
+              
+              <div class="row">
+                <!-- Actores -->
+                <div class="col-md-6 mb-4">
+                  <h4 class="border-bottom border-secondary pb-2 mb-3">Reparto</h4>
+                  <div class="list-group list-group-flush" id="listaActores">
+                    <!-- Actores se cargarán dinámicamente -->
+                  </div>
+                </div>
+                
+                <!-- Detalles adicionales -->
+                <div class="col-md-6">
+                  <h4 class="border-bottom border-secondary pb-2 mb-3">Detalles</h4>
+                  <div class="list-group list-group-flush">
+                    <div class="list-group-item bg-transparent text-white border-secondary">
+                      <strong>Director:</strong> <span id="directorPelicula"></span>
+                    </div>
+                    <div class="list-group-item bg-transparent text-white border-secondary">
+                      <strong>Géneros:</strong> 
+                      <div id="listaGeneros" class="d-flex flex-wrap gap-2 mt-2">
+                        <!-- Géneros se cargarán dinámicamente -->
+                      </div>
+                    </div>
+                    <div class="list-group-item bg-transparent text-white border-secondary">
+                      <strong>Idiomas:</strong> 
+                      <div id="listaIdiomas" class="d-flex flex-wrap gap-2 mt-2">
+                        <!-- Idiomas se cargarán dinámicamente -->
+                      </div>
+                    </div>
+                    <div class="list-group-item bg-transparent text-white border-secondary">
+                      <strong>Compañías:</strong> 
+                      <div id="listaCompanias" class="d-flex flex-wrap gap-2 mt-2">
+                        <!-- Compañías se cargarán dinámicamente -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i> Cerrar
+          </button>
+          <button type="button" class="btn btn-primary" id="addToFavorites">
+            <i class="fas fa-heart me-1"></i> Favoritos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4 mt-5 border-top border-secondary">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <h3 class="h5 mb-3"><i class="fas fa-film me-2"></i>ReelStorm</h3>
+          <p class="text-muted">El mejor catálogo de películas para cinéfilos. Descubre, explora y disfruta del séptimo arte.</p>
+        </div>
+        
+        <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
+          <h3 class="h5 mb-3">Enlaces</h3>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="../index.html" class="text-muted">Inicio</a></li>
+            <li class="mb-2"><a href="catalogo.html" class="text-muted">Catálogo</a></li>
+            <li class="mb-2"><a href="proximos.html" class="text-muted">Próximos</a></li>
+            <li class="mb-2"><a href="contacto.html" class="text-muted">Contacto</a></li>
+          </ul>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+          <h3 class="h5 mb-3">Newsletter</h3>
+          <p class="text-muted mb-3">Suscríbete para recibir novedades y estrenos.</p>
+          <form class="needs-validation" novalidate>
+            <div class="input-group">
+              <input type="email" class="form-control bg-secondary border-secondary text-white" 
+                     placeholder="Tu email" required>
+              <button class="btn btn-primary" type="submit">Suscribir</button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="col-lg-2 col-md-2">
+          <h3 class="h5 mb-3">Redes</h3>
+          <div class="d-flex gap-3">
+            <a href="#" class="text-muted" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-muted" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-muted" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-muted" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+      
+      <hr class="my-4 border-secondary">
+      
+      <div class="text-center text-muted">
+        <small>&copy; 2023 ReelStorm. Todos los derechos reservados.</small>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts optimizados -->
+  <!-- Bootstrap JS con integridad -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
+          integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" 
+          crossorigin="anonymous"></script>
+  
+  <!-- Aplicación principal con defer -->
+  <script src="../js/aplicacion.js" defer></script>
+  
+  <!-- Tema oscuro/claro -->
+  <script src="../js/tema.js" defer></script>
+  
+  <!-- Precarga de imágenes importantes -->
+  <link rel="preload" href="../img/hero-bg.jpg" as="image">
+</body>
+</html>
