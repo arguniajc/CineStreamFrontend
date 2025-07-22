@@ -224,6 +224,18 @@ form:hover {
   color: white;
 }
 
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 220px;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   body {
@@ -232,6 +244,9 @@ form:hover {
 
   form {
     padding: 1.5rem;
+  }
+    .form-row {
+    flex-direction: column;
   }
 
   h1 {

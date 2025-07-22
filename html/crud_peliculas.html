@@ -17,93 +17,92 @@
   </div>
 
   <main>
+
+    <!-- Botón de volver -->
+    <div style="margin-bottom: 1rem;">
+      <button onclick="window.history.back()" class="btn btn-outline-light">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+
     <form id="formPelicula" novalidate>
       <h1><i class="fas fa-film"></i> Crear Película</h1>
 
-      <!-- Título español -->
-      <label for="titulo_espanol">Título español:</label>
-      <input type="text" id="titulo_espanol" name="titulo_espanol" required placeholder="Ej: El Padrino" />
-      <div class="error-message">Este campo es obligatorio</div>
-
-      <!-- Título original -->
-      <label for="titulo_original">Título original:</label>
-      <input type="text" id="titulo_original" name="titulo_original" required placeholder="Ej: The Godfather" />
-      <div class="error-message">Este campo es obligatorio</div>
-
-    <!-- Año de estreno -->
-    <label for="ano_estreno">Año de estreno</label>
-    <select id="ano_estreno" name="ano_estreno" required>
-      <option value="">Seleccione un año</option>
-    </select>
-    <div class="error-message">Este campo es obligatorio</div>
-
-
-
-
-      <!-- Duración -->
-      <label>Duración:</label>
-      <div class="inline-inputs">
-        <div>
-          <input type="number" id="duracion_horas" name="duracion_horas" min="0" placeholder="Horas" required />
-          <div class="error-message">Valor inválido</div>
+      <!-- Títulos -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="titulo_espanol">Título español:</label>
+          <input type="text" id="titulo_espanol" name="titulo_espanol" required placeholder="Ej: El Padrino" />
+          <div class="error-message">Este campo es obligatorio</div>
         </div>
-        <div>
-          <input type="number" id="duracion_minutos" name="duracion_minutos" min="0" max="59" placeholder="Minutos" required />
-          <div class="error-message">Debe ser 0-59</div>
+        <div class="form-group">
+          <label for="titulo_original">Título original:</label>
+          <input type="text" id="titulo_original" name="titulo_original" required placeholder="Ej: The Godfather" />
+          <div class="error-message">Este campo es obligatorio</div>
         </div>
       </div>
 
-      <!-- Calificación -->
+      <!-- Año + Duración -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="ano_estreno">Año de estreno</label>
+          <select id="ano_estreno" name="ano_estreno" required>
+            <option value="">Seleccione un año</option>
+          </select>
+          <div class="error-message">Este campo es obligatorio</div>
+        </div>
+        <div class="form-group">
+          <label for="duracion_minutos">Duración (minutos):</label>
+          <input type="number" id="duracion_minutos" name="duracion_minutos" min="1" max="1000" placeholder="Ej: 120" required />
+          <div class="error-message">Valor inválido</div>
+        </div>
+      </div>
 
-    <label for="calificacion">Calificación (1.0 - 10.0):</label>
-    <input
-      type="number"
-      id="calificacion"
-      name="calificacion"
-      min="1"
-      max="10"
-      step="0.1"
-      required
-    />
-    <div class="error-message">Debe estar entre 1.0 y 10.0</div>
-
-      
-
-      <!-- Fecha estreno -->
-      <label for="fecha_estreno">Fecha estreno:</label>
-      <input type="date" id="fecha_estreno" name="fecha_estreno" required />
-      <div class="error-message">Selecciona una fecha</div>
+      <!-- Calificación + Fecha estreno -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="calificacion">Calificación (1.0 - 10.0):</label>
+          <input type="number" id="calificacion" name="calificacion" min="1" max="10" step="0.1" required />
+          <div class="error-message">Debe estar entre 1.0 y 10.0</div>
+        </div>
+        <div class="form-group">
+          <label for="fecha_estreno">Fecha estreno:</label>
+          <input type="date" id="fecha_estreno" name="fecha_estreno" required />
+          <div class="error-message">Selecciona una fecha</div>
+        </div>
+      </div>
 
       <!-- Sinopsis -->
       <label for="sinopsis">Sinopsis:</label>
       <textarea id="sinopsis" name="sinopsis" required placeholder="Describe la trama de la película..."></textarea>
       <div class="error-message">Este campo es obligatorio</div>
 
-      <!-- Trailer -->
-      <label for="trailer_url">Trailer URL:</label>
-      <input type="url" id="trailer_url" name="trailer_url" required placeholder="https://youtube.com/watch?v=..." />
-      <div class="error-message">Ingresa una URL válida</div>
+      <!-- Trailer + País + Imagen -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="trailer_url">Trailer URL:</label>
+          <input type="url" id="trailer_url" name="trailer_url" required placeholder="https://youtube.com/watch?v=..." />
+          <div class="error-message">Ingresa una URL válida</div>
+        </div>
+        <div class="form-group">
+          <label for="pais">País:</label>
+          <select id="pais" name="pais" required>
+            <option value="">Seleccione un país</option>
+          </select>
+          <div class="error-message">Este campo es obligatorio</div>
+        </div>
+        <div class="form-group">
+          <label for="imagen_portada">Imagen portada URL:</label>
+          <input type="url" id="imagen_portada" name="imagen_portada" required placeholder="https://example.com/poster.jpg" />
+          <div class="error-message">Ingresa una URL válida</div>
+        </div>
+      </div>
 
-            <!-- Vista previa de video del tráiler -->
-    <div class="video-preview-container" id="videoPreviewContainer" style="display: none;">
-      <span class="video-preview-label">Vista previa del tráiler:</span>
-      <iframe id="videoPreview" class="video-preview" frameborder="0" allowfullscreen></iframe>
-    </div>
-
-
-      <!-- País -->
-      <label for="pais">País:</label>
-      <select id="pais" name="pais" required>
-        <option value="">Seleccione un país</option>
-      </select>
-      <div class="error-message">Este campo es obligatorio</div>
-
-      <!-- Imagen portada -->
-      <label for="imagen_portada">Imagen portada URL:</label>
-      <input type="url" id="imagen_portada" name="imagen_portada" required placeholder="https://example.com/poster.jpg" />
-      <div class="error-message">Ingresa una URL válida</div>
-
-
+      <!-- Vista previa del tráiler -->
+      <div class="video-preview-container" id="videoPreviewContainer" style="display: none;">
+        <span class="video-preview-label">Vista previa del tráiler:</span>
+        <iframe id="videoPreview" class="video-preview" frameborder="0" allowfullscreen></iframe>
+      </div>
 
       <!-- Vista previa de la imagen -->
       <div class="image-preview-container" id="imagePreviewContainer">
