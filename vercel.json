@@ -2,7 +2,7 @@
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/consultar-peliculas", "destination": "/html/consultar-peliculas.html" },
-    { "source": "/crud-peliculas", "destination": "/html/crud_peliculas.html" },
+    { "source": "/crear-peliculas", "destination": "/html/crear-peliculas.html" },
     { "source": "/actores", "destination": "/html/actores.html" },
     { "source": "/agregar-actores", "destination": "/html/agregar_actores.html" },
     { "source": "/agregar-companias", "destination": "/html/agregar-companias.html" },

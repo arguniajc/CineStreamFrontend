@@ -4,7 +4,7 @@ const peliculaId = urlParams.get("peliculaId");
 
 if (!peliculaId) {
   alert("ID de película no encontrado. Redirigiendo...");
-  window.location.href = "crud_peliculas.html"; // o a donde quieras llevarlo
+  window.location.href = "crear-peliculas.html"; // o a donde quieras llevarlo
 }
 
 const actorSelect = document.getElementById("actorSelect");
