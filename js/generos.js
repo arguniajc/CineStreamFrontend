@@ -14,28 +14,37 @@ const cargarItems = async () => {
     const card = document.createElement("div");
     card.className = "card";
 
+    const filaTop = document.createElement("div");
+    filaTop.className = "card-header";
+
     const nombre = document.createElement("h3");
     nombre.textContent = item.nombre;
 
+    const botones = document.createElement("div");
+    botones.className = "botones";
+
+    const btnEditar = document.createElement("button");
+    btnEditar.className = "edit-btn-inline";
+    btnEditar.textContent = "Editar";
+    btnEditar.onclick = () => abrirModal(item);
+
     const btnEliminar = document.createElement("button");
-    btnEliminar.className = "delete-btn";
-    btnEliminar.textContent = "🗑️";
+    btnEliminar.className = "delete-btn-inline";
+    btnEliminar.textContent = "Eliminar";
     btnEliminar.onclick = async (e) => {
       e.stopPropagation();
-      if (confirm(`¿Eliminar \"${item.nombre}\"?`)) {
+      if (confirm(`¿Eliminar "${item.nombre}"?`)) {
         await fetch(`${apiUrl}/${item.id}`, { method: "DELETE" });
         cargarItems();
       }
     };
 
-    const btnEditar = document.createElement("button");
-    btnEditar.className = "edit-btn";
-    btnEditar.textContent = "✏️";
-    btnEditar.onclick = () => abrirModal(item);
+    botones.appendChild(btnEditar);
+    botones.appendChild(btnEliminar);
+    filaTop.appendChild(nombre);
+    filaTop.appendChild(botones);
+    card.appendChild(filaTop);
 
-    card.appendChild(nombre);
-    card.appendChild(btnEditar);
-    card.appendChild(btnEliminar);
     contenedor.appendChild(card);
   });
 };
@@ -50,11 +59,11 @@ const abrirModal = (item = null) => {
     inputNombre.value = "";
     modalTitulo.textContent = "Nuevo Género";
   }
-  modal.style.display = "block";
+  modal.classList.add("show");
 };
 
 const cerrarModal = () => {
-  modal.style.display = "none";
+  modal.classList.remove("show");
 };
 
 const guardarItem = async () => {

@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Idiomas - CRUD Moderno</title>
-  <link rel="stylesheet" href="../css/idiomas.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Idiomas</title>
+  <link rel="stylesheet" href="../css/idiomas.css" />
 </head>
 <body>
-  <header>
+  <header class="header">
     <h1>Gestión de Idiomas</h1>
   </header>
 
   <div class="container">
     <div class="actions">
-      <button onclick="abrirModal()">Agregar Idioma</button>
+      <button id="btnAgregar">Agregar Idioma</button>
     </div>
-    <div class="grid" id="contenedor"></div>
+
+    <div id="listaIdiomas" class="grid"></div>
   </div>
 
-  <!-- Modal -->
-  <div class="modal" id="modal">
+  <div id="modal" class="modal">
     <div class="modal-content">
-      <span class="close" onclick="cerrarModal()">&times;</span>
-      <h2 id="modal-titulo">Nuevo Idioma</h2>
+      <span class="close" id="btnCerrar">&times;</span>
+      <h2 id="modalTitulo">Agregar Idioma</h2>
       <input type="hidden" id="item-id">
       <input type="text" id="item-nombre" placeholder="Nombre del idioma">
-      <button onclick="guardarItem()">Guardar</button>
+      <button id="btnGuardar">Guardar</button>
     </div>
   </div>
 

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Géneros de Películas</title>
+  <style>
+    :root {
+      --bg-color: #0f0f12;
+      --card-bg: rgba(30, 30, 40, 0.7);
+      --accent: #ff4d6d;
+      --text-primary: #ffffff;
+      --border-radius: 12px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--accent);
+    }
+
+    .form-genero {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .form-genero input {
+      flex: 1;
+      padding: 10px;
+      border-radius: var(--border-radius);
+      border: none;
+      background-color: #1a1a23;
+      color: white;
+    }
+
+    .form-genero button {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .form-genero button:hover {
+      background-color: #e0435f;
+    }
+
+    .genero-lista {
+      list-style: none;
+      padding: 0;
+    }
+
+    .genero-lista li {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      border-radius: var(--border-radius);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .genero-lista .acciones span {
+      cursor: pointer;
+      margin-left: 10px;
+      font-size: 18px;
+      transition: transform 0.2s;
+    }
+
+    .genero-lista .acciones span:hover {
+      transform: scale(1.2);
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Géneros de Películas</h1>
+    
+    <form id="formAgregarGenero" class="form-genero">
+      <input type="text" id="nuevoGenero" placeholder="Nuevo género..." required />
+      <button type="submit">➕ Agregar</button>
+    </form>
+
+    <ul id="listaGeneros" class="genero-lista">
+      <!-- Se llena dinámicamente -->
+    </ul>
+  </div>
+
+  <script>
+    const listaGeneros = document.getElementById('listaGeneros');
+    const form = document.getElementById('formAgregarGenero');
+    const input = document.getElementById('nuevoGenero');
+
+    const generosIniciales = [
+      "Acción", "Animación", "Aventura", "Ciencia ficción", "Comedia", "Crimen", "Documental",
+      "Drama", "Fantasia", "Fantasía", "Guerra", "Guerra futurista", "Historia", "Infantil",
+      "Misterio", "Musical", "Romance", "Super heroes", "Suspenso", "Terror", "Western"
+    ];
+
+    function crearGeneroItem(nombre) {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span>${nombre}</span>
+        <div class="acciones">
+          <span onclick="editarGenero(this)">✏️</span>
+          <span onclick="eliminarGenero(this)">🗑️</span>
+        </div>
+      `;
+      listaGeneros.appendChild(li);
+    }
+
+    function editarGenero(elemento) {
+      const span = elemento.closest('li').querySelector('span');
+      const nuevoNombre = prompt("Editar género:", span.textContent);
+      if (nuevoNombre) {
+        span.textContent = nuevoNombre;
+      }
+    }
+
+    function eliminarGenero(elemento) {
+      const li = elemento.closest('li');
+      li.remove();
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nuevoGenero = input.value.trim();
+      if (nuevoGenero) {
+        crearGeneroItem(nuevoGenero);
+        input.value = "";
+      }
+    });
+
+    // Inicializar con los géneros predeterminados
+    generosIniciales.forEach(crearGeneroItem);
+  </script>
+</body>
+</html>

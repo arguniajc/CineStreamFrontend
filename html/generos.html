@@ -6,28 +6,30 @@
   <link rel="stylesheet" href="../css/generos.css">
 </head>
 <body>
-  <header>
-    <h1>Gestión de Géneros</h1>
-  </header>
+  
+<header class="header">
+  <h1>Gestión de Géneros</h1>
+</header>
 
-  <div class="container">
-    <div class="actions">
-      <button onclick="abrirModal()">Agregar Género</button>
-    </div>
-    <div class="grid" id="contenedor"></div>
+<div class="container">
+  <div class="actions">
+    <button onclick="abrirModal()">Agregar Género</button>
   </div>
 
-  <!-- Modal -->
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <span class="close" onclick="cerrarModal()">&times;</span>
-      <h2 id="modal-titulo">Nuevo Género</h2>
-      <input type="hidden" id="item-id">
-      <input type="text" id="item-nombre" placeholder="Nombre del género">
-      <button onclick="guardarItem()">Guardar</button>
-    </div>
-  </div>
+  <div class="grid" id="contenedor"></div>
+</div>
 
-  <script src="../js/generos.js"></script>
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <span class="close" onclick="cerrarModal()">&times;</span>
+    <h2 id="modal-titulo">Nuevo Género</h2>
+    <input type="hidden" id="item-id">
+    <input type="text" id="item-nombre" placeholder="Nombre del género">
+    <button onclick="guardarItem()">Guardar</button>
+  </div>
+</div>
+
+<script src="../js/generos.js"></script>
 </body>
 </html>
