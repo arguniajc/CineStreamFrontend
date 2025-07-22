@@ -1,20 +1,5 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/consultar-peliculas", "destination": "/html/consultar-peliculas.html" },
-    { "source": "/crud-peliculas", "destination": "/html/crud_peliculas.html" },
-    { "source": "/actores", "destination": "/html/actores.html" },
-    { "source": "/agregar-actores", "destination": "/html/agregar_actores.html" },
-    { "source": "/agregar-companias", "destination": "/html/agregar-companias.html" },
-    { "source": "/agregar-directores", "destination": "/html/agregar-directores.html" },
-    { "source": "/agregar-generos", "destination": "/html/agregar-generos.html" },
-    { "source": "/agregar-idiomas", "destination": "/html/agregar-idiomas.html" },
-    { "source": "/companias", "destination": "/html/companias.html" },
-    { "source": "/directores", "destination": "/html/directores.html" },
-    { "source": "/idiomas", "destination": "/html/idiomas.html" },
-    { "source": "/pelicula-director", "destination": "/html/pelicula_director.html" },
-    { "source": "/pelicula-actor", "destination": "/html/pelicula-actor.html" },
-    { "source": "/pelicula-compania", "destination": "/html/pelicula-compania.html" },
-    { "source": "/pelicula-idioma", "destination": "/html/pelicula-idioma.html" }
+    { "source": "/", "destination": "/index.html" }
   ]
 }
