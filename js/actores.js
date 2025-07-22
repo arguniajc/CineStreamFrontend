@@ -8,7 +8,8 @@ const modalTitulo = document.getElementById("modal-titulo");
 
 const cargarActores = async () => {
   const res = await fetch(apiUrl);
-  const actores = await res.json();
+  const actores = (await res.json()).sort((a, b) => a.nombre.localeCompare(b.nombre));
+
   contenedor.innerHTML = "";
 
   actores.forEach(actor => {

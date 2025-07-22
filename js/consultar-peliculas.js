@@ -4,13 +4,13 @@ const modalPelicula = new bootstrap.Modal(document.getElementById('modalPelicula
 async function cargarPeliculas() {
   try {
     const res = await fetch("http://localhost:3000/api/peliculas");
-    const peliculas = await res.json();
+   const peliculas = (await res.json()).sort((a, b) => b.ano_estreno - a.ano_estreno);
+
 
     peliculas.forEach(pelicula => {
       const movieCard = document.createElement("div");
       movieCard.className = "movie-card";
       movieCard.dataset.id = pelicula.id;
-
       movieCard.innerHTML = `
         <img src="${pelicula.imagen_portada}" alt="${pelicula.titulo_espanol}" class="movie-poster">
         <div class="movie-info">

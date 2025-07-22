@@ -1,46 +1,72 @@
+:root {
+   --primary: #0f0f12;
+  --secondary: #1a1a23;
+  --accent: #ff4d6d;
+  --accent-hover: #1565c0;
+  --danger: #e53935;
+  --danger-hover: #f44336;
+  --text-primary: #f8f9fa;
+  --text-secondary: #adb5bd;
+  --card-bg: rgba(30, 30, 40, 0.6);
+  --card-hover: rgba(42, 42, 53, 0.7);
+  --modal-bg: #1e1e1e;
+  --input-bg: #333333;
+  --error-bg: #b71c1c;
+}
+
+
+
 body {
-  background-color: #121212;
-  color: #ffffff;
+  background-color: var(--primary);
+  color: var(--text-primary);
   font-family: 'Segoe UI', sans-serif;
   padding: 20px;
+  margin: 0;
 }
 
 h1 {
+  color: var(--text-primary);
   margin-bottom: 20px;
+  font-size: 24px;
 }
 
 #btnAgregar {
-  background-color: #1e88e5;
+  background-color: var(--accent);
   color: white;
   border: none;
   padding: 10px 20px;
   margin-bottom: 20px;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
 }
 
 #btnAgregar:hover {
-  background-color: #1565c0;
+  background-color: var(--accent-hover);
 }
 
 #lista {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 15px;
+  padding: 0;
 }
 
 .card {
-  background-color: #1e1e1e;
+  background-color: var(--card-bg);
   border-radius: 10px;
   padding: 8px;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
   position: relative;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .card:hover {
-  background-color: #2a2a2a;
+  background-color: var(--card-hover);
   transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .card img {
@@ -48,6 +74,7 @@ h1 {
   height: 120px;
   object-fit: cover;
   border-radius: 8px;
+  margin-bottom: 6px;
 }
 
 .card-info {
@@ -57,12 +84,15 @@ h1 {
 .card-info p {
   margin: 2px 0;
   font-size: 13px;
-  color: #ccc;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-info p.nombre {
   font-weight: bold;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 14px;
 }
 
@@ -71,15 +101,20 @@ h1 {
   top: 5px;
   right: 5px;
   background-color: transparent;
-  color: #e53935;
+  color: var(--danger);
   border: none;
   font-size: 16px;
   cursor: pointer;
   display: none;
+  transition: color 0.2s ease;
 }
 
 .card:hover .btn-eliminar {
   display: block;
+}
+
+.btn-eliminar:hover {
+  color: var(--danger-hover);
 }
 
 .modal {
@@ -90,16 +125,24 @@ h1 {
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
 }
 
 .modal-content {
-  background: #1e1e1e;
+  background: var(--modal-bg);
   padding: 20px;
   margin: 10% auto;
   width: 320px;
   border-radius: 8px;
   position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--text-primary);
+  font-size: 20px;
 }
 
 .modal-content select {
@@ -108,19 +151,26 @@ h1 {
   margin: 10px 0;
   border: none;
   border-radius: 5px;
-  background: #333;
+  background: var(--input-bg);
   color: white;
+  font-size: 14px;
 }
 
 .modal-content button {
   width: 100%;
   padding: 10px;
-  background: #1e88e5;
+  background: var(--accent);
   border: none;
   border-radius: 5px;
   color: white;
   font-weight: bold;
   cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.modal-content button:hover {
+  background-color: var(--accent-hover);
 }
 
 .close {
@@ -129,14 +179,52 @@ h1 {
   right: 15px;
   font-size: 22px;
   cursor: pointer;
-  color: #f44336;
+  color: var(--danger);
+  transition: color 0.2s ease;
+}
+
+.close:hover {
+  color: var(--danger-hover);
 }
 
 #mensajeError {
-  background: #b71c1c;
+  background: var(--error-bg);
   color: white;
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
   display: none;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #lista {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+  
+  .card img {
+    height: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 15px;
+  }
+  
+  #lista {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+  }
+  
+  .card img {
+    height: 100px;
+  }
+  
+  .modal-content {
+    width: 90%;
+    padding: 15px;
+  }
 }

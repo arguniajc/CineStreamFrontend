@@ -8,7 +8,7 @@ const modalTitulo = document.getElementById("modal-titulo");
 
 const cargarItems = async () => {
   const res = await fetch(apiUrl);
-  const items = await res.json();
+  const items = (await res.json()).sort((a, b) => a.nombre.localeCompare(b.nombre));
   contenedor.innerHTML = "";
 
   items.forEach(item => {

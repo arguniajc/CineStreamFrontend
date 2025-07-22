@@ -15,7 +15,7 @@ const relaciones = document.getElementById("relaciones");
 const cargarItems = async () => {
   try {
     const res = await fetch(apiUrl);
-    const items = await res.json();
+    const items = (await res.json()).sort((a, b) => b.ano_estreno - a.ano_estreno);
     contenedor.innerHTML = "";
 
     items.forEach(item => {

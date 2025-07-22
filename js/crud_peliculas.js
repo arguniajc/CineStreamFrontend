@@ -1,82 +1,185 @@
+// =======================
+// Vista previa de imagen
+// =======================
 
-// Vista previa de la imagen
-const imagenPortadaInput = document.getElementById('imagen_portada');
-const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-const imagePreview = document.getElementById('imagePreview');
+const inputImagenPortada = document.getElementById('imagen_portada');
+const contenedorPreview = document.getElementById('imagePreviewContainer');
+const vistaPrevia = document.getElementById('imagePreview');
 
-imagenPortadaInput.addEventListener('input', function() {
-  const url = this.value.trim();
-  if (url) {
-    imagePreview.src = url;
-    imagePreviewContainer.style.display = 'block';
-    
-    // Verificar si la imagen carga correctamente
-    imagePreview.onload = function() {
-      imagePreviewContainer.style.display = 'block';
-    };
-    
-    imagePreview.onerror = function() {
-      imagePreviewContainer.style.display = 'none';
-    };
+inputImagenPortada.addEventListener('input', () => {
+  const url = inputImagenPortada.value.trim();
+
+  if (!url) {
+    contenedorPreview.style.display = 'none';
+    return;
+  }
+
+  vistaPrevia.src = url;
+
+  vistaPrevia.onload = () => {
+    contenedorPreview.style.display = 'block';
+  };
+
+  vistaPrevia.onerror = () => {
+    contenedorPreview.style.display = 'none';
+  };
+});
+
+// =======================
+// Vista previa de video (tráiler)
+// =======================
+
+const inputTrailer = document.getElementById('trailer_url');
+const contenedorVideo = document.getElementById('videoPreviewContainer');
+const vistaVideo = document.getElementById('videoPreview');
+
+inputTrailer.addEventListener('input', () => {
+  const url = inputTrailer.value.trim();
+  const embed = convertirYouTubeEmbed(url);
+
+  if (embed) {
+    vistaVideo.src = embed;
+    contenedorVideo.style.display = 'block';
   } else {
-    imagePreviewContainer.style.display = 'none';
+    vistaVideo.src = '';
+    contenedorVideo.style.display = 'none';
   }
 });
 
-// Toggle de tema (opcional)
-const themeToggle = document.getElementById('themeToggle');
-const html = document.documentElement;
+function convertirYouTubeEmbed(url) {
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+}
 
-themeToggle.addEventListener('click', function() {
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-  
-  // Cambiar variables CSS según el tema
-  if (isDark) {
-    // Tema claro
-    document.documentElement.style.setProperty('--text', '#333333');
-    document.documentElement.style.setProperty('--text-light', '#6b7280');
-    document.documentElement.style.setProperty('--bg', '#f9fafb');
-    document.documentElement.style.setProperty('--card-bg', '#ffffff');
-    document.documentElement.style.setProperty('--border', '#e5e7eb');
-    document.documentElement.style.setProperty('--preview-bg', '#f3f4f6');
-  } else {
-    // Tema oscuro
-    document.documentElement.style.setProperty('--text', '#e5e7eb');
-    document.documentElement.style.setProperty('--text-light', '#9ca3af');
-    document.documentElement.style.setProperty('--bg', '#111827');
-    document.documentElement.style.setProperty('--card-bg', '#1f2937');
-    document.documentElement.style.setProperty('--border', '#374151');
-    document.documentElement.style.setProperty('--preview-bg', '#111827');
+// =======================
+// Toggle de tema
+// =======================
+
+const btnTema = document.getElementById('themeToggle');
+const htmlRoot = document.documentElement;
+
+btnTema.addEventListener('click', () => {
+  const modoOscuro = htmlRoot.getAttribute('data-theme') === 'dark';
+  const nuevoTema = modoOscuro ? 'light' : 'dark';
+
+  htmlRoot.setAttribute('data-theme', nuevoTema);
+  btnTema.innerHTML = modoOscuro ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+  const variablesTema = modoOscuro
+    ? {
+        '--text': '#333333',
+        '--text-light': '#6b7280',
+        '--bg': '#f9fafb',
+        '--card-bg': '#ffffff',
+        '--border': '#e5e7eb',
+        '--preview-bg': '#f3f4f6',
+      }
+    : {
+        '--text': '#e5e7eb',
+        '--text-light': '#9ca3af',
+        '--bg': '#111827',
+        '--card-bg': '#1f2937',
+        '--border': '#374151',
+        '--preview-bg': '#111827',
+      };
+
+  for (const [variable, valor] of Object.entries(variablesTema)) {
+    htmlRoot.style.setProperty(variable, valor);
   }
 });
 
-// Mantener la lógica original del formulario
-const form = document.getElementById("formPelicula");
+// =======================
+// Cargar países desde API
+// =======================
 
-form.addEventListener("submit", async function (e) {
+const selectPais = document.getElementById("pais");
+
+async function cargarPaises() {
+  try {
+    const response = await fetch("https://restcountries.com/v3.1/all?fields=translations,cca2,name");
+    const data = await response.json();
+
+    const paisesOrdenados = data
+      .map(p => ({
+        nombre: p.translations?.spa?.common || p.name.common,
+        codigo: p.cca2
+      }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+    paisesOrdenados.forEach(pais => {
+      const option = document.createElement("option");
+      option.value = pais.nombre;
+      option.textContent = pais.nombre;
+      selectPais.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error("Error cargando países:", error);
+    alert("No se pudieron cargar los países.");
+  }
+}
+
+cargarPaises();
+
+// =======================
+// Lógica del formulario
+// =======================
+
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("ano_estreno");
+  for (let anio = 1900; anio <= 2050; anio++) {
+    const option = document.createElement("option");
+    option.value = anio;
+    option.textContent = anio;
+    select.appendChild(option);
+  }
+
+  // Validación dinámica del input de calificación
+  const calificacionInput = document.getElementById("calificacion");
+  calificacionInput.addEventListener("input", () => {
+    let valor = parseFloat(calificacionInput.value);
+
+    if (isNaN(valor)) return;
+
+    if (valor > 10) {
+      calificacionInput.value = 10;
+    } else if (valor < 1) {
+      calificacionInput.value = 1;
+    }
+  });
+});
+
+
+
+const formPelicula = document.getElementById("formPelicula");
+
+formPelicula.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const tituloEspanol = document.getElementById("titulo_espanol").value.trim();
-  const tituloOriginal = document.getElementById("titulo_original").value.trim();
-  const anio = parseInt(document.getElementById("ano_estreno").value);
-  const horas = parseInt(document.getElementById("duracion_horas").value);
-  const minutos = parseInt(document.getElementById("duracion_minutos").value);
-  let calificacion = parseFloat(document.getElementById("calificacion").value);
-  const fechaEstreno = document.getElementById("fecha_estreno").value;
-  const sinopsis = document.getElementById("sinopsis").value.trim();
-  const trailerUrl = document.getElementById("trailer_url").value.trim();
-  const pais = document.getElementById("pais").value.trim();
-  const imagenPortada = document.getElementById("imagen_portada").value.trim();
+  const getValue = (id) => document.getElementById(id).value.trim();
 
-  if (!tituloEspanol || !tituloOriginal || !anio || !fechaEstreno || !sinopsis || !trailerUrl || !pais || !imagenPortada) {
+  const tituloEspanol = getValue("titulo_espanol");
+  const tituloOriginal = getValue("titulo_original");
+  const anio = parseInt(getValue("ano_estreno"));
+  const horas = parseInt(getValue("duracion_horas"));
+  const minutos = parseInt(getValue("duracion_minutos"));
+  let calificacion = parseFloat(getValue("calificacion"));
+  const fechaEstreno = getValue("fecha_estreno");
+  const sinopsis = getValue("sinopsis");
+  const trailerUrl = getValue("trailer_url");
+  const pais = getValue("pais");
+  const imagenPortada = getValue("imagen_portada");
+
+  if (
+    !tituloEspanol || !tituloOriginal || !anio || !fechaEstreno ||
+    !sinopsis || !trailerUrl || !pais || !imagenPortada
+  ) {
     alert("Todos los campos son obligatorios.");
     return;
   }
 
-  if (isNaN(anio) || anio < 1990 || anio > 2050) {
-    alert("El año debe estar entre 1990 y 2050.");
+  if (isNaN(anio) || anio < 1900 || anio > 2050) {
+    alert("El año debe estar entre 1900 y 2050.");
     return;
   }
 
@@ -96,41 +199,41 @@ form.addEventListener("submit", async function (e) {
     return;
   }
 
-  if (calificacion > 10) calificacion = 10;
-  if (calificacion < 1) calificacion = 1;
-
+  calificacion = Math.min(Math.max(calificacion, 1), 10);
   calificacion = parseFloat(calificacion.toFixed(1));
 
-  const data = {
+  const pelicula = {
     titulo_espanol: tituloEspanol,
     titulo_original: tituloOriginal,
     ano_estreno: anio,
-    duracion: duracion,
-    calificacion: calificacion,
+    duracion,
+    calificacion,
     fecha_estreno: fechaEstreno,
-    sinopsis: sinopsis,
-    pais: pais,
+    sinopsis,
+    pais,
     trailer_url: trailerUrl,
     imagen_portada: imagenPortada
   };
 
-  console.log("📦 Enviando JSON:", JSON.stringify(data, null, 2));
+  console.log("📦 Enviando JSON:", JSON.stringify(pelicula, null, 2));
 
   try {
-    const response = await fetch("http://localhost:3000/api/peliculas", {
+    const respuesta = await fetch("http://localhost:3000/api/peliculas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(pelicula)
     });
 
-    const result = await response.json();
+    const resultado = await respuesta.json();
 
-    if (!response.ok) {
-      alert("❌ Error: " + result.error);
-    } else {
-      const idPelicula = result.id || result._id || result.peliculaId;
-      window.location.href = `agregar_actores.html?peliculaId=${encodeURIComponent(idPelicula)}`;
+    if (!respuesta.ok) {
+      alert("❌ Error: " + resultado.error);
+      return;
     }
+
+    const idPelicula = resultado.id || resultado._id || resultado.peliculaId;
+    window.location.href = `agregar_actores.html?peliculaId=${encodeURIComponent(idPelicula)}`;
+
   } catch (error) {
     alert("⚠️ Error creando película: " + error.message);
   }

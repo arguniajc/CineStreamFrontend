@@ -6,76 +6,116 @@
   <title>Crear Película</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/crud_peliculas.css">
-
 </head>
 <body>
-  <!-- Botón para cambiar tema (opcional) -->
+
+  <!-- Botón para cambiar tema -->
   <div class="theme-toggle">
-    <button class="theme-toggle-btn" id="themeToggle">
+    <button type="button" class="theme-toggle-btn" id="themeToggle" aria-label="Cambiar tema">
       <i class="fas fa-moon"></i>
     </button>
   </div>
 
-  <form id="formPelicula" novalidate>
-    <h1><i class="fas fa-film"></i> Crear Película</h1>
+  <main>
+    <form id="formPelicula" novalidate>
+      <h1><i class="fas fa-film"></i> Crear Película</h1>
 
-    <label for="titulo_espanol">Título español:</label>
-    <input type="text" id="titulo_espanol" required placeholder="Ej: El Padrino" />
+      <!-- Título español -->
+      <label for="titulo_espanol">Título español:</label>
+      <input type="text" id="titulo_espanol" name="titulo_espanol" required placeholder="Ej: El Padrino" />
+      <div class="error-message">Este campo es obligatorio</div>
+
+      <!-- Título original -->
+      <label for="titulo_original">Título original:</label>
+      <input type="text" id="titulo_original" name="titulo_original" required placeholder="Ej: The Godfather" />
+      <div class="error-message">Este campo es obligatorio</div>
+
+    <!-- Año de estreno -->
+    <label for="ano_estreno">Año de estreno</label>
+    <select id="ano_estreno" name="ano_estreno" required>
+      <option value="">Seleccione un año</option>
+    </select>
     <div class="error-message">Este campo es obligatorio</div>
 
-    <label for="titulo_original">Título original:</label>
-    <input type="text" id="titulo_original" required placeholder="Ej: The Godfather" />
-    <div class="error-message">Este campo es obligatorio</div>
 
-    <label for="ano_estreno">Año de estreno (1990-2050):</label>
-    <input type="number" id="ano_estreno" min="1990" max="2050" required placeholder="1990-2050" />
-    <div class="error-message">El año debe estar entre 1990 y 2050</div>
 
-    <label>Duración:</label>
-    <div class="inline-inputs">
-      <div style="flex: 1;">
-        <input type="number" id="duracion_horas" min="0" placeholder="Horas" required />
-        <div class="error-message">Valor inválido</div>
+
+      <!-- Duración -->
+      <label>Duración:</label>
+      <div class="inline-inputs">
+        <div>
+          <input type="number" id="duracion_horas" name="duracion_horas" min="0" placeholder="Horas" required />
+          <div class="error-message">Valor inválido</div>
+        </div>
+        <div>
+          <input type="number" id="duracion_minutos" name="duracion_minutos" min="0" max="59" placeholder="Minutos" required />
+          <div class="error-message">Debe ser 0-59</div>
+        </div>
       </div>
-      <div style="flex: 1;">
-        <input type="number" id="duracion_minutos" min="0" max="59" placeholder="Minutos" required />
-        <div class="error-message">Debe ser 0-59</div>
-      </div>
-    </div>
+
+      <!-- Calificación -->
 
     <label for="calificacion">Calificación (1.0 - 10.0):</label>
-    <input type="number" id="calificacion" step="0.1" min="1.0" max="10.0" required placeholder="Ej: 8.5" />
-    <div class="error-message">Debe ser entre 1.0 y 10.0</div>
+    <input
+      type="number"
+      id="calificacion"
+      name="calificacion"
+      min="1"
+      max="10"
+      step="0.1"
+      required
+    />
+    <div class="error-message">Debe estar entre 1.0 y 10.0</div>
 
-    <label for="fecha_estreno">Fecha estreno:</label>
-    <input type="date" id="fecha_estreno" required />
-    <div class="error-message">Selecciona una fecha</div>
+      
 
-    <label for="sinopsis">Sinopsis:</label>
-    <textarea id="sinopsis" required placeholder="Describe la trama de la película..."></textarea>
-    <div class="error-message">Este campo es obligatorio</div>
+      <!-- Fecha estreno -->
+      <label for="fecha_estreno">Fecha estreno:</label>
+      <input type="date" id="fecha_estreno" name="fecha_estreno" required />
+      <div class="error-message">Selecciona una fecha</div>
 
-    <label for="trailer_url">Trailer URL:</label>
-    <input type="url" id="trailer_url" required placeholder="https://youtube.com/watch?v=..." />
-    <div class="error-message">Ingresa una URL válida</div>
+      <!-- Sinopsis -->
+      <label for="sinopsis">Sinopsis:</label>
+      <textarea id="sinopsis" name="sinopsis" required placeholder="Describe la trama de la película..."></textarea>
+      <div class="error-message">Este campo es obligatorio</div>
 
-    <label for="pais">País:</label>
-    <input type="text" id="pais" required placeholder="Ej: Estados Unidos" />
-    <div class="error-message">Este campo es obligatorio</div>
+      <!-- Trailer -->
+      <label for="trailer_url">Trailer URL:</label>
+      <input type="url" id="trailer_url" name="trailer_url" required placeholder="https://youtube.com/watch?v=..." />
+      <div class="error-message">Ingresa una URL válida</div>
 
-    <label for="imagen_portada">Imagen portada URL:</label>
-    <input type="url" id="imagen_portada" required placeholder="https://example.com/poster.jpg" />
-    <div class="error-message">Ingresa una URL válida</div>
-
-    <!-- Vista previa de la imagen -->
-    <div class="image-preview-container" id="imagePreviewContainer">
-      <span class="image-preview-label">Vista previa:</span>
-      <img src="" alt="Vista previa de la portada" class="image-preview" id="imagePreview">
+            <!-- Vista previa de video del tráiler -->
+    <div class="video-preview-container" id="videoPreviewContainer" style="display: none;">
+      <span class="video-preview-label">Vista previa del tráiler:</span>
+      <iframe id="videoPreview" class="video-preview" frameborder="0" allowfullscreen></iframe>
     </div>
 
-    <button type="submit"><i class="fas fa-save"></i> Guardar Película</button>
-  </form>
 
-  <script src="..//js/crud_peliculas.js"></script>
+      <!-- País -->
+      <label for="pais">País:</label>
+      <select id="pais" name="pais" required>
+        <option value="">Seleccione un país</option>
+      </select>
+      <div class="error-message">Este campo es obligatorio</div>
+
+      <!-- Imagen portada -->
+      <label for="imagen_portada">Imagen portada URL:</label>
+      <input type="url" id="imagen_portada" name="imagen_portada" required placeholder="https://example.com/poster.jpg" />
+      <div class="error-message">Ingresa una URL válida</div>
+
+
+
+      <!-- Vista previa de la imagen -->
+      <div class="image-preview-container" id="imagePreviewContainer">
+        <span class="image-preview-label">Vista previa:</span>
+        <img src="" alt="Vista previa de la portada" class="image-preview" id="imagePreview">
+      </div>
+
+      <!-- Botón guardar -->
+      <button type="submit"><i class="fas fa-save"></i> Guardar Película</button>
+    </form>
+  </main>
+
+  <script src="../js/crud_peliculas.js"></script>
 </body>
 </html>
