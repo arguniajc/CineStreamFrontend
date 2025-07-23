@@ -393,24 +393,25 @@ const Validacion = {
 const Formulario = {
   // Obtener datos del formulario
   obtenerDatos: () => {
-    const getValue = (id) => {
-      const element = document.getElementById(id);
-      return element ? element.value.trim() : '';
-    };
-    
-    return {
-      tituloEspanol: getValue("titulo_espanol"),
-      tituloOriginal: getValue("titulo_original"),
-      anio: parseInt(getValue("ano_estreno")),
-      duracion: parseInt(getValue("duracion_minutos")),
-      calificacion: parseFloat(getValue("calificacion")),
-      fechaEstreno: getValue("fecha_estreno"),
-      sinopsis: getValue("sinopsis"),
-      trailerUrl: getValue("trailer_url"),
-      pais: getValue("pais"),
-      imagenPortada: getValue("imagen_portada")
-    };
-  },
+  const getValue = (id) => {
+    const element = document.getElementById(id);
+    return element ? element.value.trim() : '';
+  };
+
+  return {
+    titulo_espanol: getValue("titulo_espanol"),
+    titulo_original: getValue("titulo_original"),
+    ano_estreno: parseInt(getValue("ano_estreno")),
+    duracion_minutos: parseInt(getValue("duracion_minutos")),
+    calificacion: parseFloat(getValue("calificacion")),
+    fecha_estreno: getValue("fecha_estreno"),
+    sinopsis: getValue("sinopsis"),
+    trailer_url: getValue("trailer_url"),
+    pais_id: getValue("pais"), // Asegúrate que el backend espera un string tipo "US" o convierte al ID correspondiente
+    imagen_portada: getValue("imagen_portada")
+  };
+},
+
   
   // Enviar datos al servidor
   enviarDatos: async (datos) => {
