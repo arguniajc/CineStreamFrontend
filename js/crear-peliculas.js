@@ -456,7 +456,7 @@ const Formulario = {
       setTimeout(() => {
         const idPelicula = respuesta.id || respuesta._id || respuesta.peliculaId;
         if (idPelicula) {
-         window.location.href = `/agregaractores?peliculaId=${idPelicula}`;
+         window.location.href = `/agregaractores?peliculaId=${encodeURIComponent(idPelicula)}`;
         } else {
           Notificaciones.mostrar("No se recibió ID de película", "error");
         }
