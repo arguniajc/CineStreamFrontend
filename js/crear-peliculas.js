@@ -456,8 +456,9 @@ const Formulario = {
       setTimeout(() => {
         const idPelicula = respuesta.id || respuesta._id || respuesta.peliculaId;
         if (idPelicula) {
-          window.location.href = `html/agregar_actores.html?peliculaId=${encodeURIComponent(idPelicula)}`;
+          window.location.href = `/agregar-actores?peliculaId=${encodeURIComponent(idPelicula)}`;
 
+          
         } else {
           Notificaciones.mostrar("No se recibió ID de película", "error");
         }
